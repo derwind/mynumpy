@@ -106,6 +106,8 @@ class ndarray:
         if self.size % size_ != 0:
             raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
 
+        # confirmed valid shape
+
         data = self.flatten()
         for d in reversed(shape[1:]):
             if d != len(data):
