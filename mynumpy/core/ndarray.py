@@ -96,7 +96,15 @@ class ndarray:
             subsize = 1
             for d in shape[1:]:
                 subsize *= d
+            if self.size % subsize != 0:
+                raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
             shape[0] = self.size // subsize
+
+        size_ = 1
+        for d in shape:
+            size_ *= d
+        if self.size % size_ != 0:
+            raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
 
         data = self.flatten()
         for d in reversed(shape[1:]):

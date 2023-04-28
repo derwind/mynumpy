@@ -331,6 +331,11 @@ class TestNdArray(unittest.TestCase):
         self.assertEqual(a.reshape((3, 1)), [[1], [2], [3]])
         self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3]])
 
+        with self.assertRaises(ValueError):
+            a.reshape((-1, 5))
+        with self.assertRaises(ValueError):
+            a.reshape((2, 3))
+
         data = [
             [1, 2],
             [3, 4]
@@ -341,6 +346,11 @@ class TestNdArray(unittest.TestCase):
         self.assertEqual(a.reshape((-1, 4)), [1, 2, 3, 4])
         self.assertEqual(a.reshape((4, 1)), [[1], [2], [3], [4]])
         self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3], [4]])
+
+        with self.assertRaises(ValueError):
+            a.reshape((-1, 3))
+        with self.assertRaises(ValueError):
+            a.reshape((8, 7))
 
         data = [
             [
@@ -453,3 +463,8 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
+
+        with self.assertRaises(ValueError):
+            a.reshape((-1, 3, 3))
+        with self.assertRaises(ValueError):
+            a.reshape((2, 5, 2))
