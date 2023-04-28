@@ -1,6 +1,7 @@
 from typing import List, Tuple, Union
 from mynumpy.dtypes import Numbers
 
+
 class ndarray:
     def __init__(data: List[Numbers]): ...
 
