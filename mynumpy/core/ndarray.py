@@ -1,5 +1,6 @@
 import copy
 
+
 class ndarray:
     def __init__(self, data):
         self.data = copy.deepcopy(data)
@@ -15,7 +16,7 @@ class ndarray:
             return False
         return self.data == other.data
 
-    def  __ne__(self, other):
+    def __ne__(self, other):
         if not isinstance(other, ndarray):
             return True
         return self.data != other.data
