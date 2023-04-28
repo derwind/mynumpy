@@ -179,3 +179,75 @@ class TestNdArray(unittest.TestCase):
         a = mynp.array(data)
 
         self.assertEqual(a.shape, [4, 2, 3])
+
+    def test_len(self):
+        data = [1, 2, 3]
+        a = mynp.array(data)
+
+        self.assertEqual(len(a), 3)
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(len(a), 2)
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+                        [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(len(a), 4)
+
+    def test_size(self):
+        data = [1, 2, 3]
+        a = mynp.array(data)
+
+        self.assertEqual(a.size, 3)
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.size, 4)
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+                        [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.size, 24)

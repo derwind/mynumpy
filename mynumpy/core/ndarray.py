@@ -36,6 +36,9 @@ class ndarray:
     def __truediv__(self, other):
         ...
 
+    def __len__(self):
+        return len(self.data)
+
     @property
     def ndim(self):
         def count_dim(data, count):
@@ -57,7 +60,10 @@ class ndarray:
 
     @property
     def size(self):
-        ...
+        size_ = 1
+        for d in self.shape:
+            size_ *= d
+        return size_
 
     @property
     def T(self):
