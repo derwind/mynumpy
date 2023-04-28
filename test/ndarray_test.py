@@ -323,3 +323,50 @@ class TestNdArray(unittest.TestCase):
         a = mynp.array(data)
 
         self.assertEqual(a.flatten(), [1, -2, 3, -4, 5, -6, -7, 8, -9, 10, -11, 12, -1, 2, -3, 4, -5, 6, 7, -8, 9, -10, 11, -12])
+
+    def test_reshape(self):
+        data = [1, 2, 3]
+        a = mynp.array(data)
+
+        self.assertEqual(a.reshape((3, 1)), [[1], [2], [3]])
+        self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3]])
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.reshape((1, 4)), [1, 2, 3, 4])
+        self.assertEqual(a.reshape((-1, 4)), [1, 2, 3, 4])
+        self.assertEqual(a.reshape((4, 1)), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3], [4]])
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+            [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.reshape((2, 3, 4)), [
+            [
+                [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
+            ],
+            [
+                [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
+            ]
+        ])

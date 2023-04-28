@@ -81,4 +81,26 @@ class ndarray:
         return walk(self.data, [])
 
     def reshape(self, shape):
-        ...
+        def split_list(l, n):
+            for idx in range(0, len(l), n):
+                yield l[idx:idx + n]
+
+        shape = list(shape)
+        if shape[0] != -1:
+            size = 1
+            for d in shape:
+                size *= d
+            if self.size != size:
+                raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
+        elif shape[0] == -1:
+            subsize = 1
+            for d in shape[1:]:
+                subsize *= d
+            shape[0] = self.size // subsize
+
+        data = self.flatten()
+        for d in reversed(shape[1:]):
+            if d != len(data):
+                data = list(split_list(data, d))
+
+        return data
