@@ -22,7 +22,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Deps
-        run: python -m pip install -U -r requirements.txt
+        run: python -m pip install -U -r requirements-dev.txt
+      - name: Install MyNumPy
+        run: |
+          python -m pip install -U .
       - name: Run Tests
         run: |
           set -e
