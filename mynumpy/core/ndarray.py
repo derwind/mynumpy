@@ -47,7 +47,13 @@ class ndarray:
 
     @property
     def shape(self):
-        ...
+        def count_dims(data, dims):
+            if not isinstance(data, list):
+                return dims
+            dims.append(len(data))
+            return count_dims(data[0], dims)
+
+        return count_dims(self.data, [])
 
     @property
     def size(self):
