@@ -1,2 +1,2 @@
-from .array import *
-from .ndarray import *
+from .array import array
+from .ndarray import ndarray

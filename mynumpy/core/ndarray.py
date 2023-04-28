@@ -1,6 +1,8 @@
-class ndarray():
+import copy
+
+class ndarray:
     def __init__(self, data):
-        self.data = data
+        self.data = copy.deepcopy(data)
 
     def __str__(self):
         return str(self.data)
