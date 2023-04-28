@@ -11,10 +11,14 @@ class ndarray:
         return str(self.data)
 
     def __eq__(self, other):
-        ...
+        if not isinstance(other, ndarray):
+            return False
+        return self.data == other.data
 
     def  __ne__(self, other):
-        ...
+        if not isinstance(other, ndarray):
+            return True
+        return self.data != other.data
 
     def __add__(self, other):
         ...
@@ -33,7 +37,12 @@ class ndarray:
 
     @property
     def ndim(self):
-        ...
+        def count_dim(data, count):
+            if not isinstance(data, list):
+                return count
+            return count_dim(data[0], count + 1)
+
+        return count_dim(self.data, 0)
 
     @property
     def shape(self):
