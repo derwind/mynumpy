@@ -69,5 +69,16 @@ class ndarray:
     def T(self):
         ...
 
+    def flatten(self):
+        def walk(data, list_):
+            if not isinstance(data, list):
+                list_.append(data)
+                return list_
+            for subdata in data:
+                list_ = walk(subdata, list_)
+            return list_
+
+        return walk(self.data, [])
+
     def reshape(self, shape):
         ...
