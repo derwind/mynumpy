@@ -2,6 +2,7 @@ import codecs
 import os.path
 import re
 
+import setuptools
 from setuptools import setup
 
 
@@ -24,6 +25,6 @@ setup(
     name='mynumpy',
     version=find_version('mynumpy', 'version.py'),
     description='An imitation of NumPy',
-    packages=['mynumpy'],
+    packages=setuptools.find_packages(exclude=["test*"]),
     install_requires=[],
 )
