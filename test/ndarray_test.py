@@ -593,14 +593,18 @@ class TestNdArray(unittest.TestCase):
 
         self.assertEqual(a.data, [0, 0, 0])
 
-        a = mynp.zeros(2, 2)
+        a = mynp.zeros((3))
+
+        self.assertEqual(a.data, [0, 0, 0])
+
+        a = mynp.zeros((2, 2))
 
         self.assertEqual(a.data, [
             [0, 0],
             [0, 0]
         ])
 
-        a = mynp.zeros(4, 2, 3)
+        a = mynp.zeros((4, 2, 3))
 
         self.assertEqual(a.data, [
             [

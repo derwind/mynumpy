@@ -166,17 +166,15 @@ def calc_size(shape, *args):
     return size
 
 
-def _zeros(shape, *args):
-    if len(args) > 0:
-        shape = [shape] + list(args)
-    elif isinstance(shape, int):
+def _zeros(shape):
+    if isinstance(shape, int):
         shape = [shape]
 
     return ndarray([0] * calc_size(shape))._reshape(shape)
 
 
-def zeros(shape, *args):
-    return ndarray(_zeros(shape, *args))
+def zeros(shape):
+    return ndarray(_zeros(shape))
 
 
 def zeros_like(a):
