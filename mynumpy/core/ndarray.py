@@ -63,16 +63,13 @@ class ndarray:
 
     @property
     def size(self):
-        size_ = 1
-        for d in self.shape:
-            size_ *= d
-        return size_
+        return self.calc_size(self.shape)
 
     @property
     def T(self):
         ...
 
-    def flatten(self):
+    def _flatten(self):
         def walk(data, list_):
             if not isinstance(data, list):
                 list_.append(data)
@@ -83,7 +80,10 @@ class ndarray:
 
         return walk(self.data, [])
 
-    def reshape(self, shape, *args):
+    def flatten(self):
+        return ndarray(self._flatten())
+
+    def _reshape(self, shape, *args):
         def split_list(l, n):
             for idx in range(0, len(l), n):
                 yield l[idx : idx + n]
@@ -93,30 +93,32 @@ class ndarray:
 
         shape = list(shape)
         if shape[0] != -1:
-            size = 1
-            for d in shape:
-                size *= d
-            if self.size != size:
+            if self.size != self.calc_size(shape):
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
         elif shape[0] == -1:
-            subsize = 1
-            for d in shape[1:]:
-                subsize *= d
+            subsize = self.calc_size(shape[1:])
             if self.size % subsize != 0:
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
             shape[0] = self.size // subsize
 
-        size_ = 1
-        for d in shape:
-            size_ *= d
-        if self.size % size_ != 0:
+        if self.size % self.calc_size(shape) != 0:
             raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
 
         # confirmed valid shape
 
-        data = self.flatten()
+        data = self._flatten()
         for d in reversed(shape[1:]):
             if d != len(data):
                 data = list(split_list(data, d))
 
         return data
+
+    def reshape(self, shape, *args):
+        return ndarray(self._reshape(shape, *args))
+
+    @staticmethod
+    def calc_size(shape):
+        size_ = 1
+        for d in shape:
+            size_ *= d
+        return size_
