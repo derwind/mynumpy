@@ -1,43 +1,47 @@
+from typing import List, Tuple, Union, Optional
+from ..dtypes import Numbers
+
+
 class ndarray:
-    def __init__(self, data):
+    def __init__(self, data: List[Numbers]):
         self.data = data
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'ndarray({str(self.data)})'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'ndarray({str(self.data)})'
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'ndarray') -> bool:
         if not isinstance(other, ndarray):
             return False
         return self.data == other.data
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'ndarray') -> bool:
         if not isinstance(other, ndarray):
             return True
         return self.data != other.data
 
-    def __add__(self, other):
+    def __add__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         ...
 
-    def __sub__(self, other):
+    def __sub__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         ...
 
-    def __mul__(self, other):
+    def __mul__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         ...
 
-    def __matmul__(self, other):
+    def __matmul__(self, other: 'ndarray') -> 'ndarray':
         ...
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         ...
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
     @property
-    def ndim(self):
+    def ndim(self) -> int:
         def count_dim(data, count):
             if not isinstance(data, list):
                 return count
@@ -46,17 +50,17 @@ class ndarray:
         return count_dim(self.data, 0)
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple[int]:
         dims = calc_shape(self.data)
         if len(dims) <= 1:
             return (dims[0],)
         return tuple(dims)
 
     @property
-    def size(self):
+    def size(self) -> int:
         return calc_size(self.shape)
 
-    def _transpose(self):
+    def _transpose(self) -> List[Numbers]:
         def calc_target_indices(data, out_index_list):
             def walk(data, out_list, indices):
                 if not isinstance(data[0], list):
@@ -90,10 +94,10 @@ class ndarray:
         return placeholder
 
     @property
-    def T(self):
+    def T(self) -> 'ndarray':
         return ndarray(self._transpose())
 
-    def _flatten(self):
+    def _flatten(self) -> List[Numbers]:
         def walk(data, list_):
             if not isinstance(data, list):
                 list_.append(data)
@@ -104,10 +108,10 @@ class ndarray:
 
         return walk(self.data, [])
 
-    def flatten(self):
+    def flatten(self) -> 'ndarray':
         return ndarray(self._flatten())
 
-    def _reshape(self, shape, *args):
+    def _reshape(self, shape, *args) -> List[Numbers]:
         def split_list(l, n):
             for idx in range(0, len(l), n):
                 yield l[idx : idx + n]
@@ -141,11 +145,11 @@ class ndarray:
 
         return data
 
-    def reshape(self, shape, *args):
+    def reshape(self, shape, *args) -> 'ndarray':
         return ndarray(self._reshape(shape, *args))
 
 
-def calc_shape(data, dims=None):
+def calc_shape(data, dims: Optional[List[int]]=None) -> List[int]:
     if dims is None:
         dims = []
     if not isinstance(data, list):
@@ -154,7 +158,7 @@ def calc_shape(data, dims=None):
     return calc_shape(data[0], dims)
 
 
-def calc_size(shape, *args):
+def calc_size(shape: Union[int, List[int], Tuple[int]], *args) -> int:
     if len(args) > 0:
         shape = [shape] + list(args)
     elif isinstance(shape, int):
@@ -166,18 +170,18 @@ def calc_size(shape, *args):
     return size
 
 
-def _zeros(shape):
+def _zeros(shape) -> List[int]:
     if isinstance(shape, int):
         shape = [shape]
 
     return ndarray([0] * calc_size(shape))._reshape(shape)
 
 
-def zeros(shape):
+def zeros(shape) -> 'ndarray':
     return ndarray(_zeros(shape))
 
 
-def zeros_like(a):
+def zeros_like(a) -> 'ndarray':
     if isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
