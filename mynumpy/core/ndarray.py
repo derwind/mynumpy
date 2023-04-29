@@ -83,10 +83,13 @@ class ndarray:
 
         return walk(self.data, [])
 
-    def reshape(self, shape):
+    def reshape(self, shape, *args):
         def split_list(l, n):
             for idx in range(0, len(l), n):
                 yield l[idx : idx + n]
+
+        if len(args) > 0:
+            shape = [shape] + list(args)
 
         shape = list(shape)
         if shape[0] != -1:

@@ -293,7 +293,9 @@ class TestNdArray(unittest.TestCase):
         a = mynp.array(data)
 
         self.assertEqual(a.reshape((3, 1)), [[1], [2], [3]])
+        self.assertEqual(a.reshape(3, 1), [[1], [2], [3]])
         self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3]])
+        self.assertEqual(a.reshape(-1, 1), [[1], [2], [3]])
 
         with self.assertRaises(ValueError):
             a.reshape((-1, 5))
@@ -307,9 +309,13 @@ class TestNdArray(unittest.TestCase):
         a = mynp.array(data)
 
         self.assertEqual(a.reshape((1, 4)), [1, 2, 3, 4])
+        self.assertEqual(a.reshape(1, 4), [1, 2, 3, 4])
         self.assertEqual(a.reshape((-1, 4)), [1, 2, 3, 4])
+        self.assertEqual(a.reshape(-1, 4), [1, 2, 3, 4])
         self.assertEqual(a.reshape((4, 1)), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape(4, 1), [[1], [2], [3], [4]])
         self.assertEqual(a.reshape((-1, 1)), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape(-1, 1), [[1], [2], [3], [4]])
 
         with self.assertRaises(ValueError):
             a.reshape((-1, 3))
@@ -344,7 +350,23 @@ class TestNdArray(unittest.TestCase):
                 [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
+        self.assertEqual(a.reshape(2, 3, 4), [
+            [
+                [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
+            ],
+            [
+                [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
+            ]
+        ])
         self.assertEqual(a.reshape((-1, 3, 4)), [
+            [
+                [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
+            ],
+            [
+                [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
+            ]
+        ])
+        self.assertEqual(a.reshape(-1, 3, 4), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
             ],
@@ -354,6 +376,20 @@ class TestNdArray(unittest.TestCase):
         ])
 
         self.assertEqual(a.reshape((4, 3, 2)), [
+            [
+                [1, -2], [3, -4], [5, -6]
+            ],
+            [
+                [-7, 8], [-9, 10], [-11, 12]
+            ],
+            [
+                [-1, 2], [-3, 4], [-5, 6]
+            ],
+            [
+                [7, -8], [9, -10], [11, -12]
+            ]
+        ])
+        self.assertEqual(a.reshape(4, 3, 2), [
             [
                 [1, -2], [3, -4], [5, -6]
             ],
@@ -381,6 +417,20 @@ class TestNdArray(unittest.TestCase):
                 [7, -8], [9, -10], [11, -12]
             ]
         ])
+        self.assertEqual(a.reshape(-1, 3, 2), [
+            [
+                [1, -2], [3, -4], [5, -6]
+            ],
+            [
+                [-7, 8], [-9, 10], [-11, 12]
+            ],
+            [
+                [-1, 2], [-3, 4], [-5, 6]
+            ],
+            [
+                [7, -8], [9, -10], [11, -12]
+            ]
+        ])
 
         self.assertEqual(a.reshape((3, 4, 2)), [
             [
@@ -393,7 +443,29 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6], [7, -8], [9, -10], [11, -12]
             ]
         ])
+        self.assertEqual(a.reshape(3, 4, 2), [
+            [
+                [1, -2], [3, -4], [5, -6], [-7, 8]
+            ],
+            [
+                [-9, 10], [-11, 12], [-1, 2], [-3, 4]
+            ],
+            [
+                [-5, 6], [7, -8], [9, -10], [11, -12]
+            ]
+        ])
         self.assertEqual(a.reshape((-1, 4, 2)), [
+            [
+                [1, -2], [3, -4], [5, -6], [-7, 8]
+            ],
+            [
+                [-9, 10], [-11, 12], [-1, 2], [-3, 4]
+            ],
+            [
+                [-5, 6], [7, -8], [9, -10], [11, -12]
+            ]
+        ])
+        self.assertEqual(a.reshape(-1, 4, 2), [
             [
                 [1, -2], [3, -4], [5, -6], [-7, 8]
             ],
@@ -416,7 +488,29 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
+        self.assertEqual(a.reshape(3, 2, 4), [
+            [
+                [1, -2, 3, -4], [5, -6, -7, 8]
+            ],
+            [
+                [-9, 10, -11, 12], [-1, 2, -3, 4]
+            ],
+            [
+                [-5, 6, 7, -8], [9, -10, 11, -12]
+            ]
+        ])
         self.assertEqual(a.reshape((-1, 2, 4)), [
+            [
+                [1, -2, 3, -4], [5, -6, -7, 8]
+            ],
+            [
+                [-9, 10, -11, 12], [-1, 2, -3, 4]
+            ],
+            [
+                [-5, 6, 7, -8], [9, -10, 11, -12]
+            ]
+        ])
+        self.assertEqual(a.reshape(-1, 2, 4), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8]
             ],
