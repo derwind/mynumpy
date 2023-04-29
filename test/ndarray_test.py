@@ -583,3 +583,96 @@ class TestNdArray(unittest.TestCase):
                 [-6, 12, 6, -12]
             ]
         ])
+
+    def test_zeros(self):
+        a = mynp.zeros(3)
+
+        self.assertEqual(a.data, [0, 0, 0])
+
+        a = mynp.zeros([3])
+
+        self.assertEqual(a.data, [0, 0, 0])
+
+        a = mynp.zeros(2, 2)
+
+        self.assertEqual(a.data, [
+            [0, 0],
+            [0, 0]
+        ])
+
+        a = mynp.zeros(4, 2, 3)
+
+        self.assertEqual(a.data, [
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ]
+        ])
+
+    def test_zeros_like(self):
+        data = [1, 2, 3]
+        a = mynp.zeros_like(data)
+
+        self.assertEqual(a.data, [0, 0, 0])
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.zeros_like(data)
+
+        self.assertEqual(a.data, [
+            [0, 0],
+            [0, 0]
+        ])
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+            [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.zeros_like(data)
+
+        self.assertEqual(a.data, [
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0]
+            ]
+        ])

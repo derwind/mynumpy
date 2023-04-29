@@ -47,20 +47,14 @@ class ndarray:
 
     @property
     def shape(self):
-        def count_dims(data, dims):
-            if not isinstance(data, list):
-                return dims
-            dims.append(len(data))
-            return count_dims(data[0], dims)
-
-        dims = count_dims(self.data, [])
+        dims = calc_shape(self.data)
         if len(dims) <= 1:
             return (dims[0],)
         return tuple(dims)
 
     @property
     def size(self):
-        return self.calc_size(self.shape)
+        return calc_size(self.shape)
 
     def _transpose(self):
         def calc_target_indices(data, out_index_list):
@@ -120,18 +114,20 @@ class ndarray:
 
         if len(args) > 0:
             shape = [shape] + list(args)
+        elif isinstance(shape, int):
+            shape = [shape]
 
         shape = list(shape)
         if shape[0] != -1:
-            if self.size != self.calc_size(shape):
+            if self.size != calc_size(shape):
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
         elif shape[0] == -1:
-            subsize = self.calc_size(shape[1:])
+            subsize = calc_size(shape[1:])
             if self.size % subsize != 0:
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
             shape[0] = self.size // subsize
 
-        if self.size % self.calc_size(shape) != 0:
+        if self.size % calc_size(shape) != 0:
             raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
 
         # confirmed valid shape
@@ -148,9 +144,40 @@ class ndarray:
     def reshape(self, shape, *args):
         return ndarray(self._reshape(shape, *args))
 
-    @staticmethod
-    def calc_size(shape):
-        size_ = 1
-        for d in shape:
-            size_ *= d
-        return size_
+
+def calc_shape(data, dims=None):
+    if dims is None:
+        dims = []
+    if not isinstance(data, list):
+        return dims
+    dims.append(len(data))
+    return calc_shape(data[0], dims)
+
+
+def calc_size(shape, *args):
+    if len(args) > 0:
+        shape = [shape] + list(args)
+    elif isinstance(shape, int):
+        shape = [shape]
+
+    size = 1
+    for d in shape:
+        size *= d
+    return size
+
+
+def zeros(shape, *args):
+    if len(args) > 0:
+        shape = [shape] + list(args)
+    elif isinstance(shape, int):
+        shape = [shape]
+
+    return ndarray([0] * calc_size(shape)).reshape(shape)
+
+
+def zeros_like(a):
+    if isinstance(a, ndarray):
+        a = a.data
+    shape = calc_shape(a)
+
+    return zeros(shape)

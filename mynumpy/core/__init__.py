@@ -1,2 +1,2 @@
 from .array import array
-from .ndarray import ndarray
+from .ndarray import ndarray, zeros, zeros_like

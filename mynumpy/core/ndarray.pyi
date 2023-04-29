@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 from mynumpy.dtypes import Numbers
 
 
@@ -40,3 +40,15 @@ class ndarray:
     def flatten(self) -> ndarray: ...
 
     def reshape(self, shape: Union[int, List[int], Tuple[int]], *args) -> ndarray: ...
+
+
+def count_dims(data: list, dims: list) -> list: ...
+
+
+def calc_size(shape: Union[int, List[int], Tuple[int]], *args): ...
+
+
+def zeros(shape: Union[int, List[int], Tuple[int]], *args, like : Optional[Union[list, ndarray]] = None): ...
+
+
+def zeros_like(a: Union[list, ndarray]): ...
