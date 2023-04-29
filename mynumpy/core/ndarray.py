@@ -65,9 +65,66 @@ class ndarray:
     def size(self):
         return self.calc_size(self.shape)
 
+    def _transpose(self):
+        def transpose_list(flat_data, out_flat_data, shape):
+            d = shape.pop()
+            subsize = self.calc_size(shape)
+            for i in range(d):
+                out_flat_data[subsize + i] = flat_data[i * subsize]
+            transpose_list(flat_data, out_flat_data, shape)
+
+        def calc_target_indices(data, out_index_list):
+            def walk(data, out_list, indices):
+                if not isinstance(data[0], list):
+                    for i in range(len(data)):
+                        indices_ = indices[:]
+                        indices_.append(i)
+                        indices_ = list(reversed(indices_))
+                        out_list.append(indices_)
+                    return
+                for i, subdata in enumerate(data):
+                    indices_ = indices[:]
+                    indices_.append(i)
+                    walk(subdata, out_list, indices_)
+                return
+
+            walk(data, out_index_list, [])
+
+        #placeholder = 0
+        #for d in self.shape:
+        #    placeholder = [placeholder]
+        #    placeholder = placeholder * d
+        #placeholder = copy.deepcopy(placeholder)
+        placeholder = ndarray([0] * self.size)._reshape(list(reversed(self.shape)))
+
+        indices = []
+        calc_target_indices(self.data, indices)
+
+        flat_data = self._flatten()
+
+        for d, index in zip(flat_data, indices):
+            target = placeholder
+            for idx in index[:-1]:
+                target = target[idx]
+            target[index[-1]] = d
+            print(index, d, placeholder)
+
+        # shape = list(self.shape)
+        # while shape:
+        #     d = shape.pop()
+        #     for i in range(d):
+        #         self.data[i]
+
+        # for i in range(shape[0]):
+        #     for j in range(shape[1]):
+        #         for k in range(shape[2]):
+        #             placeholder[k][j][i] = self.data[i][j][k]
+
+        return placeholder
+
     @property
     def T(self):
-        ...
+        return ndarray(self._transpose())
 
     def _flatten(self):
         def walk(data, list_):
