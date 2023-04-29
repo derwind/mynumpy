@@ -6,10 +6,10 @@ class ndarray:
         self.data = data
 
     def __str__(self):
-        return str(self.data)
+        return f'ndarray({str(self.data)})'
 
     def __repr__(self):
-        return str(self.data)
+        return f'ndarray({str(self.data)})'
 
     def __eq__(self, other):
         if not isinstance(other, ndarray):
@@ -66,13 +66,6 @@ class ndarray:
         return self.calc_size(self.shape)
 
     def _transpose(self):
-        def transpose_list(flat_data, out_flat_data, shape):
-            d = shape.pop()
-            subsize = self.calc_size(shape)
-            for i in range(d):
-                out_flat_data[subsize + i] = flat_data[i * subsize]
-            transpose_list(flat_data, out_flat_data, shape)
-
         def calc_target_indices(data, out_index_list):
             def walk(data, out_list, indices):
                 if not isinstance(data[0], list):
@@ -90,11 +83,6 @@ class ndarray:
 
             walk(data, out_index_list, [])
 
-        #placeholder = 0
-        #for d in self.shape:
-        #    placeholder = [placeholder]
-        #    placeholder = placeholder * d
-        #placeholder = copy.deepcopy(placeholder)
         placeholder = ndarray([0] * self.size)._reshape(list(reversed(self.shape)))
 
         indices = []
@@ -107,18 +95,6 @@ class ndarray:
             for idx in index[:-1]:
                 target = target[idx]
             target[index[-1]] = d
-            print(index, d, placeholder)
-
-        # shape = list(self.shape)
-        # while shape:
-        #     d = shape.pop()
-        #     for i in range(d):
-        #         self.data[i]
-
-        # for i in range(shape[0]):
-        #     for j in range(shape[1]):
-        #         for k in range(shape[2]):
-        #             placeholder[k][j][i] = self.data[i][j][k]
 
         return placeholder
 
