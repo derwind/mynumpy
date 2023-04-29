@@ -294,3 +294,15 @@ def broadcast(a, shape: Union[List[int], Tuple[int]]) -> 'ndarray':
     n = shape[0]
 
     return ndarray([copy.deepcopy(a.data) for _ in range(n)])
+
+
+def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
+    subscripts = subscripts.replace(' ', '')
+
+    if len(operands) != 2:
+        raise ValueError(f'operands whose length != 2 are currently not supported')
+
+    a, b = operands
+    from_, to_ = subscripts.split('->')
+
+    raise NotImplementedError('not implemented yet')
