@@ -56,7 +56,29 @@ class ndarray:
         return ndarray([x * y for x, y in zip(a, b)]).reshape(self.shape)
 
     def __matmul__(self, other: 'ndarray') -> 'ndarray':
-        ...
+        if len(self.shape) < 1:
+            raise ValueError(f'matmul: Input operand 0 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)')
+        if len(other.shape) < 1:
+            raise ValueError(f'matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)')
+
+        if len(self.shape) != 1 and len(self.shape) != 2:
+            raise ValueError(f'matmul: Input operand 0 is neither vector nor matrix and not supported')
+        if len(other.shape) != 1 and len(other.shape) != 2:
+            raise ValueError(f'matmul: Input operand 1 is neither vector nor matrix and not supported')
+
+        if self.shape[1] != other.shape[0]:
+            raise ValueError(f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {other.shape[0]} is different from {self.shape[1]})')
+
+        n_row = self.shape[0]
+        n_col = other.shape[1]
+        placeholder = _zeros((n_row, n_col))
+
+        for r in range(n_row):
+            for c in range(n_col):
+                for i in range(self.shape[1]):
+                    placeholder[r][c] += self.data[r][i] * other.data[i][c]
+
+        return ndarray(placeholder).reshape(n_row, n_col)
 
     def __truediv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         a, b = self._prepare_operations(other)

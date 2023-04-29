@@ -1180,3 +1180,43 @@ class TestNdArray(unittest.TestCase):
             data2 = [1, 2, 3, 4, 5]
             b = mynp.array(data2)
             a / b
+
+    def test_matmul(self):
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        data2 = [
+            [-1, 0],
+            [4, -5]
+        ]
+        b = mynp.array(data2)
+
+        self.assertEqual((a @ b).data, [
+            [7, -10],
+            [13, -20]
+        ])
+
+        data = [
+            [1, 2],
+            [3, 4],
+            [5, 6]
+        ]
+        a = mynp.array(data)
+
+        data2 = [
+            [-1, 0, 3, 1],
+            [4, -5, -2, 3]
+        ]
+        b = mynp.array(data2)
+
+        self.assertEqual((a @ b).data, [
+            [7, -10, -1, 7],
+            [13, -20, 1, 15],
+            [19, -30, 3, 23]
+        ])
+
+        with self.assertRaises(ValueError):
+            b @ a
