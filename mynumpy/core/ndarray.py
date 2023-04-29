@@ -74,7 +74,7 @@ class ndarray:
 
             walk(data, out_index_list, [])
 
-        placeholder = ndarray([0] * self.size)._reshape(list(reversed(self.shape)))
+        placeholder = _zeros(list(reversed(self.shape)))
 
         indices = []
         calc_target_indices(self.data, indices)
@@ -166,13 +166,17 @@ def calc_size(shape, *args):
     return size
 
 
-def zeros(shape, *args):
+def _zeros(shape, *args):
     if len(args) > 0:
         shape = [shape] + list(args)
     elif isinstance(shape, int):
         shape = [shape]
 
-    return ndarray([0] * calc_size(shape)).reshape(shape)
+    return ndarray([0] * calc_size(shape))._reshape(shape)
+
+
+def zeros(shape, *args):
+    return ndarray(_zeros(shape, *args))
 
 
 def zeros_like(a):
