@@ -792,6 +792,20 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2]
+            b = mynp.array(data2)
+            a + b
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2, 3, 4, 5]
+            b = mynp.array(data2)
+            a + b
+
     def test_sub(self):
         data = [1, 2, 3]
         a = mynp.array(data)
@@ -902,6 +916,20 @@ class TestNdArray(unittest.TestCase):
                 [-20, 0, -24]
             ]
         ])
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2]
+            b = mynp.array(data2)
+            a - b
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2, 3, 4, 5]
+            b = mynp.array(data2)
+            a - b
 
     def test_mul(self):
         data = [1, 2, 3]
@@ -1014,6 +1042,20 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2]
+            b = mynp.array(data2)
+            a * b
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2, 3, 4, 5]
+            b = mynp.array(data2)
+            a * b
+
     def test_truediv(self):
         data = [1, 2, 3]
         a = mynp.array(data)
@@ -1124,3 +1166,17 @@ class TestNdArray(unittest.TestCase):
                 [-1.0, 1.0, -1.0]
             ]
         ])
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2]
+            b = mynp.array(data2)
+            a / b
+
+        with self.assertRaises(ValueError):
+            data = [1, 2, 3]
+            a = mynp.array(data)
+            data2 = [1, 2, 3, 4, 5]
+            b = mynp.array(data2)
+            a / b

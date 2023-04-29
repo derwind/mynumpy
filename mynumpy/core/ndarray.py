@@ -25,11 +25,17 @@ class ndarray:
 
     def _prepare_operations(self, other: Union[Numbers, 'ndarray']) -> Tuple[List[int], List[int]]:
         a = self.flatten().data
-        if self.is_number(other):
+        if is_number(other):
             b = [other] * self.size
         elif isinstance(other, list):
+            other_shape = calc_shape(other)
+            if not binary_operable(self.shape, other_shape):
+                raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = ndarray(list).flatten().data
         else:
+            other_shape = calc_shape(other)
+            if not binary_operable(self.shape, other_shape):
+                raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = other.flatten().data
 
         return a, b
@@ -168,10 +174,6 @@ class ndarray:
     def reshape(self, shape, *args) -> 'ndarray':
         return ndarray(self._reshape(shape, *args))
 
-    @staticmethod
-    def is_number(n: Any):
-        return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
-
 
 def calc_shape(a: Union[list, 'ndarray'], dims: Optional[List[int]] = None) -> List[int]:
     if isinstance(a, ndarray):
@@ -222,13 +224,21 @@ def zeros_like(a) -> 'ndarray':
     return zeros(shape)
 
 
+def is_number(n: Any):
+    return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
+
+
 def binary_operable(shape_a: Union[int, List[int], Tuple[int]], shape_b: Union[int, List[int], Tuple[int]]) -> bool:
-    if not isinstance(shape_a, list) and not isinstance(shape_a, tuple):
+    if is_number(shape_a):
         return True
 
-    if not isinstance(shape_b, list) and not isinstance(shape_b, tuple):
+    if is_number(shape_b):
         return True
 
+    if shape_a == shape_b:
+        return True
+
+    # operable if broadcast
     # XXX: very simple version
     return (shape_a[1:] == shape_b[1:]) and (shape_a[0] == 1 or shape_b[0] == 1)
 
