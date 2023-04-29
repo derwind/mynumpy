@@ -3,7 +3,7 @@ import copy
 
 class ndarray:
     def __init__(self, data):
-        self.data = copy.deepcopy(data)
+        self.data = data
 
     def __str__(self):
         return str(self.data)
@@ -56,7 +56,10 @@ class ndarray:
             dims.append(len(data))
             return count_dims(data[0], dims)
 
-        return count_dims(self.data, [])
+        dims = count_dims(self.data, [])
+        if len(dims) <= 1:
+            return (dims[0],)
+        return tuple(dims)
 
     @property
     def size(self):
@@ -83,7 +86,7 @@ class ndarray:
     def reshape(self, shape):
         def split_list(l, n):
             for idx in range(0, len(l), n):
-                yield l[idx:idx + n]
+                yield l[idx : idx + n]
 
         shape = list(shape)
         if shape[0] != -1:
