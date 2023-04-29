@@ -1,4 +1,5 @@
-from typing import List, Tuple, Union, Optional
+import copy
+from typing import List, Tuple, Union, Optional, Any
 from ..dtypes import Numbers
 
 
@@ -22,20 +23,39 @@ class ndarray:
             return True
         return self.data != other.data
 
+    def _prepare_operations(self, other: Union[Numbers, 'ndarray']) -> Tuple[List[int], List[int]]:
+        a = self.flatten().data
+        if self.is_number(other):
+            b = [other] * self.size
+        elif isinstance(other, list):
+            b = ndarray(list).flatten().data
+        else:
+            b = other.flatten().data
+
+        return a, b
+
     def __add__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        ...
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x + y for x, y in zip(a, b)]).reshape(self.shape)
 
     def __sub__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        ...
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x - y for x, y in zip(a, b)]).reshape(self.shape)
 
     def __mul__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        ...
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x * y for x, y in zip(a, b)]).reshape(self.shape)
 
     def __matmul__(self, other: 'ndarray') -> 'ndarray':
         ...
 
     def __truediv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        ...
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x / y for x, y in zip(a, b)]).reshape(self.shape)
 
     def __len__(self) -> int:
         return len(self.data)
@@ -148,14 +168,23 @@ class ndarray:
     def reshape(self, shape, *args) -> 'ndarray':
         return ndarray(self._reshape(shape, *args))
 
+    @staticmethod
+    def is_number(n: Any):
+        return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
 
-def calc_shape(data, dims: Optional[List[int]]=None) -> List[int]:
+
+def calc_shape(a: Union[list, 'ndarray'], dims: Optional[List[int]] = None) -> List[int]:
+    if isinstance(a, ndarray):
+        return a.shape
+
+    # list
+
     if dims is None:
         dims = []
-    if not isinstance(data, list):
+    if not isinstance(a, list):
         return dims
-    dims.append(len(data))
-    return calc_shape(data[0], dims)
+    dims.append(len(a))
+    return calc_shape(a[0], dims)
 
 
 def calc_size(shape: Union[int, List[int], Tuple[int]], *args) -> int:
@@ -170,11 +199,15 @@ def calc_size(shape: Union[int, List[int], Tuple[int]], *args) -> int:
     return size
 
 
-def _zeros(shape) -> List[int]:
+def _numbers(shape: Union[int, List[int], Tuple[int]], n: Numbers) -> List[int]:
     if isinstance(shape, int):
         shape = [shape]
 
-    return ndarray([0] * calc_size(shape))._reshape(shape)
+    return ndarray([n] * calc_size(shape))._reshape(shape)
+
+
+def _zeros(shape: Union[int, List[int], Tuple[int]]) -> List[int]:
+    return _numbers(shape, 0)
 
 
 def zeros(shape) -> 'ndarray':
@@ -187,3 +220,24 @@ def zeros_like(a) -> 'ndarray':
     shape = calc_shape(a)
 
     return zeros(shape)
+
+
+def binary_operable(shape_a: Union[int, List[int], Tuple[int]], shape_b: Union[int, List[int], Tuple[int]]) -> bool:
+    if not isinstance(shape_a, list) and not isinstance(shape_a, tuple):
+        return True
+
+    if not isinstance(shape_b, list) and not isinstance(shape_b, tuple):
+        return True
+
+    # XXX: very simple version
+    return (shape_a[1:] == shape_b[1:]) and (shape_a[0] == 1 or shape_b[0] == 1)
+
+
+def broadcast(a, shape: Union[List[int], Tuple[int]]) -> 'ndarray':
+    # XXX: very simple version
+    if binary_operable(a.shape, shape) or a.shape[0] != 1:
+        return a
+
+    n = shape[0]
+
+    return ndarray([copy.deepcopy(a.data) for _ in range(n)])
