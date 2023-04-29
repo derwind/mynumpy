@@ -308,10 +308,10 @@ class TestNdArray(unittest.TestCase):
         ]
         a = mynp.array(data)
 
-        self.assertEqual(a.reshape((1, 4)).data, [1, 2, 3, 4])
-        self.assertEqual(a.reshape(1, 4).data, [1, 2, 3, 4])
-        self.assertEqual(a.reshape((-1, 4)).data, [1, 2, 3, 4])
-        self.assertEqual(a.reshape(-1, 4).data, [1, 2, 3, 4])
+        self.assertEqual(a.reshape((1, 4)).data, [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape(1, 4).data, [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape((-1, 4)).data, [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape(-1, 4).data, [[1, 2, 3, 4]])
         self.assertEqual(a.reshape((4, 1)).data, [[1], [2], [3], [4]])
         self.assertEqual(a.reshape(4, 1).data, [[1], [2], [3], [4]])
         self.assertEqual(a.reshape((-1, 1)).data, [[1], [2], [3], [4]])
@@ -526,3 +526,60 @@ class TestNdArray(unittest.TestCase):
             a.reshape((-1, 3, 3))
         with self.assertRaises(ValueError):
             a.reshape((2, 5, 2))
+
+    def test_T(self):
+        data = [1, 2, 3]
+        a = mynp.array(data)
+
+        self.assertEqual(a.T.data, [1, 2, 3])
+
+        data = [[1], [2], [3]]
+        a = mynp.array(data)
+
+        self.assertEqual(a.T.data, [[1, 2, 3]])
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.T.data, [
+            [1, 3],
+            [2, 4]
+        ])
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+            [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.T.data, [
+            [
+                [1, -7, -1, 7],
+                [-4, 10, 4, -10]
+            ],
+            [
+                [-2, 8, 2, -8],
+                [5, -11, -5, 11]
+            ],
+            [
+                [3, -9, -3, 9],
+                [-6, 12, 6, -12]
+            ]
+        ])
