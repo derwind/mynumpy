@@ -62,23 +62,44 @@ class ndarray:
             raise ValueError(f'matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)')
 
         if len(self.shape) != 1 and len(self.shape) != 2:
-            raise ValueError(f'matmul: Input operand 0 is neither vector nor matrix and not supported')
+            raise ValueError(f'matmul: Input operand 0 is neither a vector nor a matrix and not supported')
         if len(other.shape) != 1 and len(other.shape) != 2:
-            raise ValueError(f'matmul: Input operand 1 is neither vector nor matrix and not supported')
+            raise ValueError(f'matmul: Input operand 1 is neither a vector nor a matrix and not supported')
 
-        if self.shape[1] != other.shape[0]:
-            raise ValueError(f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {other.shape[0]} is different from {self.shape[1]})')
+        a = self
+        b = other
+        squeeze_count = 0
+        need_transpose = False
+        if len(a.shape) == 1:
+            a = a.reshape((1, a.shape[0]))
+            assert len(a.shape) == 2
+            squeeze_count += 1
+        if len(b.shape) == 1:
+            b = b.reshape((b.shape[0], 1))
+            assert len(b.shape) == 2
+            need_transpose = True
+            squeeze_count += 1
 
-        n_row = self.shape[0]
-        n_col = other.shape[1]
+        if a.shape[1] != b.shape[0]:
+            raise ValueError(f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {b.shape[0]} is different from {a.shape[1]})')
+
+        n_row = a.shape[0]
+        n_col = b.shape[1]
         placeholder = _zeros((n_row, n_col))
 
         for r in range(n_row):
             for c in range(n_col):
-                for i in range(self.shape[1]):
-                    placeholder[r][c] += self.data[r][i] * other.data[i][c]
+                for i in range(a.shape[1]):
+                    placeholder[r][c] += a.data[r][i] * b.data[i][c]
 
-        return ndarray(placeholder).reshape(n_row, n_col)
+        m = ndarray(placeholder).reshape(n_row, n_col)
+        if need_transpose:
+            m = m.T
+        while squeeze_count > 0:
+            m = ndarray(m.data[0])
+            squeeze_count -= 1
+
+        return m
 
     def __truediv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         a, b = self._prepare_operations(other)
