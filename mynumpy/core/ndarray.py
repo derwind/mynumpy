@@ -341,6 +341,8 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
             continue
         raise ValueError(f"einstein sum subscripts string included output subscript '{idx}' which never appeared in an input")
 
+    # Preprocess finished. Main process begins
+
     placeholder = zeros(out_shape).data
 
     def calc(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
