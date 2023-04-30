@@ -1268,3 +1268,49 @@ class TestNdArray(unittest.TestCase):
             [-12, 7],
             [-26, 15]
         ])
+
+        a = mynp.array([
+            [1, 2],
+            [3, 4],
+            [5, 6]
+        ])
+
+        b = mynp.array([
+            [7, 8, 9, 10],
+            [11, 12, 13, 14]
+        ])
+
+        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+            [ 29, 32, 35, 38],
+            [ 65, 72, 79, 86],
+            [101, 112, 123, 134]
+        ])
+
+        a = mynp.array([
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [5, 6],
+                [7, 8]
+            ],
+        ])
+
+        b = mynp.array([
+            [
+                [-1, -5],
+                [-3, 2],
+                [1, 4],
+            ],
+            [
+                [3, 6],
+                [-3, 2],
+                [-4, 1],
+            ]
+        ])
+
+        self.assertEqual(mynp.einsum('ijk,ilj->jl', a, b).data, [
+            [30, -42, -41],
+            [55, 44, 43]
+        ])
