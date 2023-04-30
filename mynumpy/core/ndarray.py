@@ -1,5 +1,5 @@
 import copy
-from typing import List, Tuple, Union, Optional, Any
+from typing import List, Tuple, Dict, Union, Optional, Any
 from ..dtypes import Numbers
 
 
@@ -343,21 +343,23 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
 
     placeholder = zeros(out_shape).data
 
-    def calc(target, index, loc = None):
-        if loc is None:
-            loc = []
+    def calc(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
+        if index_kv is None:
+            index_kv = {}
 
-        idx, index = index[0], index[1:]
+        idx, index = index[0], index[1:] # index chars
 
         for i in range(i2d[idx]):
-            loc_ = loc[:]
-            loc_.append(i)
+            index_kv_ = index_kv.copy()
+            index_kv_[idx] = i
             if isinstance(target[i], list):
-                calc(target[i], index, loc_)
+                calc(target[i], index, index_kv_)
                 continue
 
             # calculate value
-            print(loc_)
+            print(index_kv_)
+            # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
+
             target[i] = target[i]
 
     calc(placeholder, to_index)
