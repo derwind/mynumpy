@@ -1245,3 +1245,26 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             b @ a
+
+    def test_einsum(self):
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        data2 = [
+            [-2, 1],
+            [-5, 3]
+        ]
+        b = mynp.array(data2)
+
+        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+            [-12, 7],
+            [-26, 15]
+        ])
+
+        self.assertEqual(mynp.einsum('jk,ki->ji', a, b).data, [
+            [-12, 7],
+            [-26, 15]
+        ])

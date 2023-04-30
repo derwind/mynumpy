@@ -57,9 +57,13 @@ class ndarray:
 
     def __matmul__(self, other: 'ndarray') -> 'ndarray':
         if len(self.shape) < 1:
-            raise ValueError(f'matmul: Input operand 0 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)')
+            raise ValueError(
+                f'matmul: Input operand 0 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)'
+            )
         if len(other.shape) < 1:
-            raise ValueError(f'matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)')
+            raise ValueError(
+                f'matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)'
+            )
 
         if len(self.shape) != 1 and len(self.shape) != 2:
             raise ValueError(f'matmul: Input operand 0 is neither a vector nor a matrix and not supported')
@@ -81,7 +85,9 @@ class ndarray:
             squeeze_count += 1
 
         if a.shape[1] != b.shape[0]:
-            raise ValueError(f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {b.shape[0]} is different from {a.shape[1]})')
+            raise ValueError(
+                f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {b.shape[0]} is different from {a.shape[1]})'
+            )
 
         n_row = a.shape[0]
         n_col = b.shape[1]
@@ -311,7 +317,7 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
             raise ValueError('operand has more dimensions than subscripts given in einstein sum')
 
         if len(op.shape) < len(index):
-         raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
+            raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
 
     if len(operands) != 2:
         raise ValueError(f'operands whose length != 2 are currently not supported')
@@ -319,14 +325,14 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
     a, b = operands
     index_a, index_b = index_list
 
-    # index char -> loc
+    # index char -> loc, e.g. {'i': 0, 'j': 1, 'k': 2, 'l': 3} for 'ijkl'
     i2l_a = {index: index_a.index(index) for index in index_a}
     i2l_b = {index: index_b.index(index) for index in index_b}
 
     # determin output tensor's shape
 
     out_shape = []
-    # index char -> dim
+    # index char -> dim, e.g. {'i': 3, 'j': 4}
     i2d = {}
     for idx in to_index:
         if idx in i2l_a:
@@ -345,23 +351,72 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
 
     placeholder = zeros(out_shape).data
 
-    def calc(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
+    def fill_placeholder(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
         if index_kv is None:
             index_kv = {}
 
-        idx, index = index[0], index[1:] # index chars
+        idx, index = index[0], index[1:]  # index chars
 
         for i in range(i2d[idx]):
             index_kv_ = index_kv.copy()
             index_kv_[idx] = i
             if isinstance(target[i], list):
-                calc(target[i], index, index_kv_)
+                fill_placeholder(target[i], index, index_kv_)
                 continue
 
-            # calculate value
-            print(index_kv_)
-            # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
+            target[i] = calc_value(a, b, index_a, index_b, index_kv_)
 
-            target[i] = target[i]
+    # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
+    def calc_value(a_1: ndarray, a_2: ndarray, index_1: Tuple[str, ...], index_2: Tuple[str, ...], index_kv: Dict[str, int]):
+        combinations_kv = []
+        calc_combinations(list(a_1.shape), list(a_2.shape), index_1, index_2, index_kv, combinations_kv)
 
-    calc(placeholder, to_index)
+        v = 0
+        for idx_kv in combinations_kv:
+            v_1 = get_value(a_1.data, index_1, idx_kv)
+            v_2 = get_value(a_2.data, index_2, idx_kv)
+            v += v_1 * v_2
+
+        return v
+
+    def calc_combinations(
+        shape_1: List[int], shape_2: List[int], index_1: List[str], index_2: List[str], index_kv: Dict[str, int], out_combs: List[Dict[str, int]]
+    ):
+        if index_1:
+            idx1, index_1 = index_1[0], index_1[1:]
+            dim1, shape_1 = shape_1[0], shape_1[1:]
+            if idx1 in index_kv:
+                calc_combinations(shape_1, shape_2, index_1, index_2, index_kv, out_combs)
+                return
+            else:
+                for i in range(dim1):
+                    index_kv_ = index_kv.copy()
+                    index_kv_[idx1] = i
+                    calc_combinations(shape_1, shape_2, index_1, index_2, index_kv_, out_combs)
+                return
+
+        if index_2:
+            idx2, index_2 = index_2[0], index_2[1:]
+            dim2, shape_2 = shape_2[0], shape_2[1:]
+            if idx2 in index_kv:
+                calc_combinations(shape_1, shape_2, index_1, index_2, index_kv, out_combs)
+                return
+            else:
+                for i in range(dim2):
+                    index_kv_ = index_kv.copy()
+                    index_kv_[idx2] = i
+                    calc_combinations(shape_1, shape_2, index_1, index_2, index_kv_, out_combs)
+                return
+
+        out_combs.append(index_kv)
+
+    def get_value(target: List[Numbers], index: List[Numbers], index_kv: Dict[str, int]):
+        if isinstance(target, list):
+            idx, index = index[0], index[1:]
+            target = target[index_kv[idx]]
+            return get_value(target, index, index_kv)
+        return target
+
+    fill_placeholder(placeholder, to_index)
+
+    return ndarray(placeholder)
