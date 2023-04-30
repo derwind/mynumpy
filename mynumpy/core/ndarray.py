@@ -299,10 +299,65 @@ def broadcast(a, shape: Union[List[int], Tuple[int]]) -> 'ndarray':
 def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
     subscripts = subscripts.replace(' ', '')
 
+    from_indices, to_index = subscripts.split('->')
+    if len(from_indices.split(',')) != len(operands):
+        raise ValueError('more operands provided to einstein sum function than specified in the subscripts string')
+
+    index_list = [[idx for idx in index] for index in from_indices.split(',')]
+    to_index = [idx for idx in to_index]
+
+    for i, (op, index) in enumerate(zip(operands, index_list)):
+        if len(op.shape) > len(index):
+            raise ValueError('operand has more dimensions than subscripts given in einstein sum')
+
+        if len(op.shape) < len(index):
+         raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
+
     if len(operands) != 2:
         raise ValueError(f'operands whose length != 2 are currently not supported')
 
     a, b = operands
-    from_, to_ = subscripts.split('->')
+    index_a, index_b = index_list
 
-    raise NotImplementedError('not implemented yet')
+    # index char -> loc
+    i2l_a = {index: index_a.index(index) for index in index_a}
+    i2l_b = {index: index_b.index(index) for index in index_b}
+
+    # determin output tensor's shape
+
+    out_shape = []
+    # index char -> dim
+    i2d = {}
+    for idx in to_index:
+        if idx in i2l_a:
+            dim = a.shape[i2l_a[idx]]
+            out_shape.append(dim)
+            i2d[idx] = dim
+            continue
+        if idx in i2l_b:
+            dim = b.shape[i2l_b[idx]]
+            out_shape.append(dim)
+            i2d[idx] = dim
+            continue
+        raise ValueError(f"einstein sum subscripts string included output subscript '{idx}' which never appeared in an input")
+
+    placeholder = zeros(out_shape).data
+
+    def calc(target, index, loc = None):
+        if loc is None:
+            loc = []
+
+        idx, index = index[0], index[1:]
+
+        for i in range(i2d[idx]):
+            loc_ = loc[:]
+            loc_.append(i)
+            if isinstance(target[i], list):
+                calc(target[i], index, loc_)
+                continue
+
+            # calculate value
+            print(loc_)
+            target[i] = target[i]
+
+    calc(placeholder, to_index)
