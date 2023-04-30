@@ -1245,3 +1245,105 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             b @ a
+
+    def test_einsum(self):
+        a = mynp.array([1, 2])
+
+        b = mynp.array([
+            [1, 2],
+            [3, 4]
+        ])
+
+        self.assertEqual(mynp.einsum('i,ij->j', a, b).data, [7, 10])
+        self.assertEqual(mynp.einsum('i,ji->j', a, b).data, [5, 11])
+
+        self.assertEqual(mynp.einsum('ij,i->j', b, a).data, [7, 10])
+        self.assertEqual(mynp.einsum('ij,j->i', b, a).data, [5, 11])
+
+        a = mynp.array([
+            [1, 2],
+            [3, 4]
+        ])
+
+        b = mynp.array([
+            [-2, 1],
+            [-5, 3]
+        ])
+
+        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+            [-12, 7],
+            [-26, 15]
+        ])
+
+        self.assertEqual(mynp.einsum('jk,ki->ji', a, b).data, [
+            [-12, 7],
+            [-26, 15]
+        ])
+
+        a = mynp.array([
+            [1, 2],
+            [3, 4],
+            [5, 6]
+        ])
+
+        b = mynp.array([
+            [7, 8, 9, 10],
+            [11, 12, 13, 14]
+        ])
+
+        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+            [ 29, 32, 35, 38],
+            [ 65, 72, 79, 86],
+            [101, 112, 123, 134]
+        ])
+
+        a = mynp.array([
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [5, 6],
+                [7, 8]
+            ],
+        ])
+
+        b = mynp.array([
+            [
+                [-1, -5],
+                [-3, 2],
+                [1, 4],
+            ],
+            [
+                [3, 6],
+                [-3, 2],
+                [-4, 1],
+            ]
+        ])
+
+        self.assertEqual(mynp.einsum('ijk,ilj->jl', a, b).data, [
+            [30, -42, -41],
+            [55, 44, 43]
+        ])
+
+        with self.assertRaises(ValueError):
+            data = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            data2 = mynp.array([
+                [-2, 1],
+                [-5, 3]
+            ])
+            mynp.einsum('ijl,jk->ik', a, b)
+
+        with self.assertRaises(ValueError):
+            data = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            data2 = mynp.array([
+                [-2, 1],
+                [-5, 3]
+            ])
+            mynp.einsum('i,jk->ik', a, b)
