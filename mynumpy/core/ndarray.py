@@ -123,6 +123,9 @@ class ndarray:
 
     @property
     def ndim(self) -> int:
+        if is_number(self.data):
+            return 0
+
         def count_dim(data, count):
             if not isinstance(data, list):
                 return count
