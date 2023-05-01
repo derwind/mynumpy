@@ -4,7 +4,7 @@ from ..dtypes import Numbers
 
 
 class ndarray:
-    def __init__(self, data: List[Numbers]):
+    def __init__(self, data: Union[Numbers, List[Numbers]]):
         self.data = data
 
     def __str__(self) -> str:
@@ -14,19 +14,25 @@ class ndarray:
         return f'ndarray({str(self.data)})'
 
     def __eq__(self, other: 'ndarray') -> bool:
-        if not isinstance(other, ndarray):
+        if not isinstance(other, ndarray) and not is_number(other):
             return False
+        if is_number(other):
+            return self.data == other
         return self.data == other.data
 
     def __ne__(self, other: 'ndarray') -> bool:
-        if not isinstance(other, ndarray):
+        if not isinstance(other, ndarray) and not is_number(other):
             return True
+        if is_number(other):
+            return self.data != other
         return self.data != other.data
 
     def _prepare_operations(self, other: Union[Numbers, 'ndarray']) -> Tuple[List[int], List[int]]:
         a = self.flatten().data
         if is_number(other):
             b = [other] * self.size
+        elif isinstance(other, ndarray) and is_number(other.data):
+            b = [other.data] * self.size
         elif isinstance(other, list):
             other_shape = calc_shape(other)
             if not binary_operable(self.shape, other_shape):
@@ -126,6 +132,9 @@ class ndarray:
 
     @property
     def shape(self) -> Tuple[int]:
+        if is_number(self.data):
+            return ()
+
         dims = calc_shape(self.data)
         if len(dims) <= 1:
             return (dims[0],)
