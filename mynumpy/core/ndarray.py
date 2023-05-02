@@ -235,6 +235,17 @@ class ndarray:
     def reshape(self, shape, *args) -> 'ndarray':
         return ndarray(self._reshape(shape, *args))
 
+    def item(self) -> Numbers:
+        if is_number(self.data):
+            return self.data
+        elif self.size == 1:
+            data = self.data
+            for _ in range(len(self.shape)):
+                data = data[0]
+            return data
+
+        raise ValueError('can only convert an array of size 1 to a Python scalar')
+
 
 def calc_shape(a: Union[list, 'ndarray'], dims: Optional[List[int]] = None) -> List[int]:
     if isinstance(a, ndarray):
