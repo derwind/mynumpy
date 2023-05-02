@@ -6,6 +6,8 @@ from ..dtypes import Numbers
 class ndarray:
     def __init__(self, data: Union[Numbers, List[Numbers]]):
         self.data = data
+        self._shape = calc_shape(self.data)
+        self._size = calc_size(self._shape)
 
     def __str__(self) -> str:
         return f'ndarray({str(self.data)})'
@@ -39,8 +41,8 @@ class ndarray:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = ndarray(list).flatten().data
         else:
-            other_shape = calc_shape(other)
-            if not binary_operable(self.shape, other_shape):
+            other_shape = other.shape
+            if not binary_operable(self.shape, other.shape):
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = other.flatten().data
 
@@ -123,31 +125,20 @@ class ndarray:
 
     @property
     def ndim(self) -> int:
-        if is_number(self.data):
-            return 0
-
-        def count_dim(data, count):
-            if not isinstance(data, list):
-                return count
-            return count_dim(data[0], count + 1)
-
-        return count_dim(self.data, 0)
+        return len(self.shape)
 
     @property
     def shape(self) -> Tuple[int]:
-        if is_number(self.data):
-            return ()
-
-        dims = calc_shape(self.data)
-        if len(dims) <= 1:
-            return (dims[0],)
-        return tuple(dims)
+        return self._shape
 
     @property
     def size(self) -> int:
-        return calc_size(self.shape)
+        return self._size
 
     def _transpose(self) -> List[Numbers]:
+        if is_number(self.data):
+            return self.data
+
         def calc_target_indices(data, out_index_list):
             def walk(data, out_list, indices):
                 if not isinstance(data[0], list):
@@ -209,6 +200,10 @@ class ndarray:
             shape = [shape]
 
         shape = list(shape)
+
+        if not shape and self.size == 1:
+            return self.item()
+
         if shape[0] != -1:
             if self.size != calc_size(shape):
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
@@ -227,25 +222,31 @@ class ndarray:
         for d in reversed(shape[1:]):
             if d != len(data):
                 data = list(split_list(data, d))
-        if shape[0] == 1:
-            data = [data]
+            if shape[0] == 1:
+                data = [data]
 
         return data
 
     def reshape(self, shape, *args) -> 'ndarray':
         return ndarray(self._reshape(shape, *args))
 
+    def item(self) -> Numbers:
+        if is_number(self.data):
+            return self.data
+        elif self.size == 1:
+            data = self.data
+            for _ in range(len(self.shape)):
+                data = data[0]
+            return data
 
-def calc_shape(a: Union[list, 'ndarray'], dims: Optional[List[int]] = None) -> List[int]:
-    if isinstance(a, ndarray):
-        return a.shape
+        raise ValueError('can only convert an array of size 1 to a Python scalar')
 
-    # list
 
+def calc_shape(a: Union[Numbers, List[int]], dims: Optional[List[int]] = None) -> List[int]:
     if dims is None:
         dims = []
-    if not isinstance(a, list):
-        return dims
+    if is_number(a):
+        return tuple(dims)
     dims.append(len(a))
     return calc_shape(a[0], dims)
 
@@ -278,11 +279,31 @@ def zeros(shape) -> 'ndarray':
 
 
 def zeros_like(a) -> 'ndarray':
-    if isinstance(a, ndarray):
+    if is_number(a):
+        return ndarray(0)
+    elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
 
     return zeros(shape)
+
+
+def _ones(shape: Union[int, List[int], Tuple[int]]) -> List[int]:
+    return _numbers(shape, 1)
+
+
+def ones(shape) -> 'ndarray':
+    return ndarray(_ones(shape))
+
+
+def ones_like(a) -> 'ndarray':
+    if is_number(a):
+        return ndarray(1)
+    elif isinstance(a, ndarray):
+        a = a.data
+    shape = calc_shape(a)
+
+    return ones(shape)
 
 
 def is_number(n: Any):
@@ -295,6 +316,9 @@ def binary_operable(shape_a: Union[int, List[int], Tuple[int]], shape_b: Union[i
 
     if is_number(shape_b):
         return True
+
+    shape_a = list(shape_a)
+    shape_b = list(shape_b)
 
     if shape_a == shape_b:
         return True
@@ -321,6 +345,12 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
     if len(from_indices.split(',')) != len(operands):
         raise ValueError('more operands provided to einstein sum function than specified in the subscripts string')
 
+    if len(operands) == 1:
+        # XXX: ad-hoc implementation
+        op = operands[0]
+        operands = [op, ones_like(op)]
+        from_indices = f'{from_indices},{from_indices}'
+
     index_list = [[idx for idx in index] for index in from_indices.split(',')]
     to_index = [idx for idx in to_index]
 
@@ -331,8 +361,8 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
         if len(op.shape) < len(index):
             raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
 
-    if len(operands) != 2:
-        raise ValueError(f'operands whose length != 2 are currently not supported')
+    if len(operands) > 2:
+        raise ValueError(f'operands whose length > 2 are currently not supported')
 
     a, b = operands
     index_a, index_b = index_list
@@ -363,9 +393,13 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
 
     placeholder = zeros(out_shape).data
 
-    def fill_placeholder(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
+    def fill_placeholder(target: List[int], index: List[str], index_kv: Optional[Dict[str, int]] = None) -> List[int]:
         if index_kv is None:
             index_kv = {}
+
+        if not index:
+            # return scaler value
+            return calc_value(a, b, index_a, index_b, index_kv)
 
         idx, index = index[0], index[1:]  # index chars
 
@@ -377,6 +411,8 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
                 continue
 
             target[i] = calc_value(a, b, index_a, index_b, index_kv_)
+
+        return target
 
     # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
     def calc_value(a_1: ndarray, a_2: ndarray, index_1: Tuple[str, ...], index_2: Tuple[str, ...], index_kv: Dict[str, int]):
@@ -429,6 +465,6 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
             return get_value(target, index, index_kv)
         return target
 
-    fill_placeholder(placeholder, to_index)
+    placeholder = fill_placeholder(placeholder, to_index)
 
     return ndarray(placeholder)
