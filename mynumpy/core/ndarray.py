@@ -6,6 +6,8 @@ from ..dtypes import Numbers
 class ndarray:
     def __init__(self, data: Union[Numbers, List[Numbers]]):
         self.data = data
+        self._shape = calc_shape(self.data)
+        self._size = calc_size(self._shape)
 
     def __str__(self) -> str:
         return f'ndarray({str(self.data)})'
@@ -39,8 +41,8 @@ class ndarray:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = ndarray(list).flatten().data
         else:
-            other_shape = calc_shape(other)
-            if not binary_operable(self.shape, other_shape):
+            other_shape = other.shape
+            if not binary_operable(self.shape, other.shape):
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = other.flatten().data
 
@@ -123,29 +125,15 @@ class ndarray:
 
     @property
     def ndim(self) -> int:
-        if is_number(self.data):
-            return 0
-
-        def count_dim(data, count):
-            if not isinstance(data, list):
-                return count
-            return count_dim(data[0], count + 1)
-
-        return count_dim(self.data, 0)
+        return len(self.shape)
 
     @property
     def shape(self) -> Tuple[int]:
-        if is_number(self.data):
-            return ()
-
-        dims = calc_shape(self.data)
-        if len(dims) <= 1:
-            return (dims[0],)
-        return tuple(dims)
+        return self._shape
 
     @property
     def size(self) -> int:
-        return calc_size(self.shape)
+        return self._size
 
     def _transpose(self) -> List[Numbers]:
         def calc_target_indices(data, out_index_list):
@@ -247,16 +235,11 @@ class ndarray:
         raise ValueError('can only convert an array of size 1 to a Python scalar')
 
 
-def calc_shape(a: Union[list, 'ndarray'], dims: Optional[List[int]] = None) -> List[int]:
-    if isinstance(a, ndarray):
-        return a.shape
-
-    # list
-
+def calc_shape(a: Union[Numbers, List[int]], dims: Optional[List[int]] = None) -> List[int]:
     if dims is None:
         dims = []
-    if not isinstance(a, list):
-        return dims
+    if is_number(a):
+        return tuple(dims)
     dims.append(len(a))
     return calc_shape(a[0], dims)
 
@@ -306,6 +289,9 @@ def binary_operable(shape_a: Union[int, List[int], Tuple[int]], shape_b: Union[i
 
     if is_number(shape_b):
         return True
+
+    shape_a = list(shape_a)
+    shape_b = list(shape_b)
 
     if shape_a == shape_b:
         return True
