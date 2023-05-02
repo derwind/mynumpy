@@ -692,6 +692,27 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+    def test_item(self):
+        data = 3
+        a = mynp.array(data)
+
+        self.assertEqual(a.item(), 3)
+
+        data = [3]
+        a = mynp.array(data)
+
+        self.assertEqual(a.item(), 3)
+
+        data = [[3]]
+        a = mynp.array(data)
+
+        self.assertEqual(a.item(), 3)
+
+        with self.assertRaises(ValueError):
+            data = [1, 2]
+            a = mynp.array(data)
+            a.item()
+
     def test_zeros_like(self):
         data = 3
         a = mynp.zeros_like(data)
