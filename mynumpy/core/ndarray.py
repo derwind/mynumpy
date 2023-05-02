@@ -345,6 +345,12 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
     if len(from_indices.split(',')) != len(operands):
         raise ValueError('more operands provided to einstein sum function than specified in the subscripts string')
 
+    if len(operands) == 1:
+        # XXX: ad-hoc implementation
+        op = operands[0]
+        operands = [op, ones_like(op)]
+        from_indices = f'{from_indices},{from_indices}'
+
     index_list = [[idx for idx in index] for index in from_indices.split(',')]
     to_index = [idx for idx in to_index]
 
@@ -355,8 +361,8 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
         if len(op.shape) < len(index):
             raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
 
-    if len(operands) != 2:
-        raise ValueError(f'operands whose length != 2 are currently not supported')
+    if len(operands) > 2:
+        raise ValueError(f'operands whose length > 2 are currently not supported')
 
     a, b = operands
     index_a, index_b = index_list
