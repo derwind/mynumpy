@@ -1364,6 +1364,11 @@ class TestNdArray(unittest.TestCase):
             b @ a
 
     def test_einsum(self):
+        a = mynp.array([1, 2, 3])
+        b = mynp.array([-2, 1, 4])
+
+        self.assertEqual(mynp.einsum('i,i->', a, b).data, 12)
+
         a = mynp.array([1, 2])
 
         b = mynp.array([

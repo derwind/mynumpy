@@ -369,9 +369,13 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
 
     placeholder = zeros(out_shape).data
 
-    def fill_placeholder(target: ndarray, index: List[str], index_kv: Optional[Dict[str, int]] = None):
+    def fill_placeholder(target: List[int], index: List[str], index_kv: Optional[Dict[str, int]] = None) -> List[int]:
         if index_kv is None:
             index_kv = {}
+
+        if not index:
+            # return scaler value
+            return calc_value(a, b, index_a, index_b, index_kv)
 
         idx, index = index[0], index[1:]  # index chars
 
@@ -383,6 +387,8 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
                 continue
 
             target[i] = calc_value(a, b, index_a, index_b, index_kv_)
+
+        return target
 
     # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
     def calc_value(a_1: ndarray, a_2: ndarray, index_1: Tuple[str, ...], index_2: Tuple[str, ...], index_kv: Dict[str, int]):
@@ -435,6 +441,6 @@ def einsum(subscripts: str, *operands: List[ndarray]) -> ndarray:
             return get_value(target, index, index_kv)
         return target
 
-    fill_placeholder(placeholder, to_index)
+    placeholder = fill_placeholder(placeholder, to_index)
 
     return ndarray(placeholder)
