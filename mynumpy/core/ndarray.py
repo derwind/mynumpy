@@ -288,6 +288,24 @@ def zeros_like(a) -> 'ndarray':
     return zeros(shape)
 
 
+def _ones(shape: Union[int, List[int], Tuple[int]]) -> List[int]:
+    return _numbers(shape, 1)
+
+
+def ones(shape) -> 'ndarray':
+    return ndarray(_ones(shape))
+
+
+def ones_like(a) -> 'ndarray':
+    if is_number(a):
+        return ndarray(1)
+    elif isinstance(a, ndarray):
+        a = a.data
+    shape = calc_shape(a)
+
+    return ones(shape)
+
+
 def is_number(n: Any):
     return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
 

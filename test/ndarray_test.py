@@ -758,6 +758,113 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+    def test_ones(self):
+        a = mynp.ones(3)
+
+        self.assertEqual(a.data, [1, 1, 1])
+
+        a = mynp.ones([3])
+
+        self.assertEqual(a.data, [1, 1, 1])
+
+        a = mynp.ones((3))
+
+        self.assertEqual(a.data, [1, 1, 1])
+
+        a = mynp.ones((2, 2))
+
+        self.assertEqual(a.data, [
+            [1, 1],
+            [1, 1]
+        ])
+
+        a = mynp.ones((4, 2, 3))
+
+        self.assertEqual(a.data, [
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ]
+        ])
+
+    def test_ones_like(self):
+        data = 3
+        a = mynp.ones_like(data)
+
+        self.assertEqual(a.data, 1)
+
+        data = [3]
+        a = mynp.ones_like(data)
+
+        self.assertEqual(a.data, [1])
+
+        data = [1, 2, 3]
+        a = mynp.ones_like(data)
+
+        self.assertEqual(a.data, [1, 1, 1])
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.ones_like(data)
+
+        self.assertEqual(a.data, [
+            [1, 1],
+            [1, 1]
+        ])
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+            [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.ones_like(data)
+
+        self.assertEqual(a.data, [
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1]
+            ]
+        ])
+
     def test_add(self):
         data = 3
         a = mynp.array(data)
@@ -1368,6 +1475,18 @@ class TestNdArray(unittest.TestCase):
         b = mynp.array([-2, 1, 4])
 
         self.assertEqual(mynp.einsum('i,i->', a, b).data, 12)
+
+        a = mynp.array([
+            [1, 2],
+            [3, 4]
+        ])
+        b = mynp.array([
+            [-5, 6],
+            [7, -8]
+        ])
+
+        self.assertEqual(mynp.einsum('ij,ij->', a, b).data, -4)
+        self.assertEqual(mynp.einsum('ij,ji->', a, b).data, -5)
 
         a = mynp.array([1, 2])
 
