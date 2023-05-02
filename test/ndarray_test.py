@@ -1513,6 +1513,29 @@ class TestNdArray(unittest.TestCase):
             [2, 4]
         ])
 
+        a = mynp.array([
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [5, 6],
+                [7, 8]
+            ],
+        ])
+
+        self.assertEqual(mynp.einsum('ijk->jki', a).data, [
+            [
+                [1, 5],
+                [2, 6]
+            ],
+            [
+                [3, 7],
+                [4, 8]
+            ]
+        ])
+
+
         a = mynp.array([1, 2, 3])
         b = mynp.array([-2, 1, 4])
 
