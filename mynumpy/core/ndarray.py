@@ -215,8 +215,8 @@ class ndarray:
         for d in reversed(shape[1:]):
             if d != len(data):
                 data = list(split_list(data, d))
-        if shape[0] == 1:
-            data = [data]
+            if shape[0] == 1:
+                data = [data]
 
         return data
 
