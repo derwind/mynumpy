@@ -136,6 +136,9 @@ class ndarray:
         return self._size
 
     def _transpose(self) -> List[Numbers]:
+        if is_number(self.data):
+            return self.data
+
         def calc_target_indices(data, out_index_list):
             def walk(data, out_list, indices):
                 if not isinstance(data[0], list):
@@ -197,6 +200,10 @@ class ndarray:
             shape = [shape]
 
         shape = list(shape)
+
+        if not shape and self.size == 1:
+            return self.item()
+
         if shape[0] != -1:
             if self.size != calc_size(shape):
                 raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
@@ -272,7 +279,9 @@ def zeros(shape) -> 'ndarray':
 
 
 def zeros_like(a) -> 'ndarray':
-    if isinstance(a, ndarray):
+    if is_number(a):
+        return ndarray(0)
+    elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
 
