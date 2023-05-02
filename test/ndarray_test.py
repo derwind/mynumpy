@@ -1444,22 +1444,22 @@ class TestNdArray(unittest.TestCase):
         ])
 
         with self.assertRaises(ValueError):
-            data = mynp.array([
+            a = mynp.array([
                 [1, 2],
                 [3, 4]
             ])
-            data2 = mynp.array([
+            b = mynp.array([
                 [-2, 1],
                 [-5, 3]
             ])
             mynp.einsum('ijl,jk->ik', a, b)
 
         with self.assertRaises(ValueError):
-            data = mynp.array([
+            a = mynp.array([
                 [1, 2],
                 [3, 4]
             ])
-            data2 = mynp.array([
+            b = mynp.array([
                 [-2, 1],
                 [-5, 3]
             ])
