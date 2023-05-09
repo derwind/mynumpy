@@ -53,15 +53,30 @@ class ndarray:
 
         return ndarray([x + y for x, y in zip(a, b)]).reshape(self.shape)
 
+    def __radd__(self, other: Numbers) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x + y for x, y in zip(b, a)]).reshape(self.shape)
+
     def __sub__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         a, b = self._prepare_operations(other)
 
         return ndarray([x - y for x, y in zip(a, b)]).reshape(self.shape)
 
+    def __rsub__(self, other: Numbers) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x - y for x, y in zip(b, a)]).reshape(self.shape)
+
     def __mul__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
         a, b = self._prepare_operations(other)
 
         return ndarray([x * y for x, y in zip(a, b)]).reshape(self.shape)
+
+    def __rmul__(self, other: Numbers) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x * y for x, y in zip(b, a)]).reshape(self.shape)
 
     def __matmul__(self, other: 'ndarray') -> 'ndarray':
         if len(self.shape) < 1:
@@ -119,6 +134,21 @@ class ndarray:
         a, b = self._prepare_operations(other)
 
         return ndarray([x / y for x, y in zip(a, b)]).reshape(self.shape)
+
+    def __rtruediv__(self, other: Numbers) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x / y for x, y in zip(b, a)]).reshape(self.shape)
+
+    def __floordiv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x // y for x, y in zip(a, b)]).reshape(self.shape)
+
+    def __rfloordiv__(self, other: Numbers) -> 'ndarray':
+        a, b = self._prepare_operations(other)
+
+        return ndarray([x // y for x, y in zip(b, a)]).reshape(self.shape)
 
     def __len__(self) -> int:
         return len(self.data)

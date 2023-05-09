@@ -1021,6 +1021,72 @@ class TestNdArray(unittest.TestCase):
             b = mynp.array(data2)
             a + b
 
+    def test_radd(self):
+        data = 3
+        a = mynp.array(data)
+
+        self.assertEqual((5 + a).data, 8)
+
+        data = [3]
+        a = mynp.array(data)
+
+        self.assertEqual((5 + a).data, [8])
+
+        data = [1, 2, 3]
+        a = mynp.array(data)
+
+        self.assertEqual((5 + a).data, [6, 7, 8])
+
+        data = [
+            [1, 2],
+            [3, 4]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual((5 + a).data, [
+            [6, 7],
+            [8, 9]
+        ])
+
+        data = [
+            [
+                [1, -2, 3],
+                [-4, 5, -6]
+            ],
+            [
+                [-7, 8, -9],
+                [10, -11, 12]
+            ],
+            [
+                [-1, 2, -3],
+                [4, -5, 6]
+            ],
+            [
+                [7, -8, 9],
+                [-10, 11, -12]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual((5 + a).data, [
+            [
+                [6, 3, 8],
+                [1, 10, -1]
+            ],
+            [
+                [-2, 13, -4],
+                [15, -6, 17]
+            ],
+            [
+                [4, 7, 2],
+                [9, 0, 11]
+            ],
+            [
+                [12, -3, 14],
+                [-5, 16, -7]
+            ]
+        ])
+
     def test_sub(self):
         data = 3
         a = mynp.array(data)
