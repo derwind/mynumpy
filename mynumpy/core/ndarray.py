@@ -29,7 +29,8 @@ class ndarray:
             return self.data != other
         return self.data != other.data
 
-    def _prepare_operations(self, other: Union[Numbers, 'ndarray']) -> Tuple[List[int], List[int]]:
+    def _prepare_operations(self, other: Union[Numbers, 'ndarray']) -> Tuple[List[int], List[int], List[int]]:
+        new_shape = list(self.shape)
         a = self.flatten().data
         if is_number(other):
             b = [other] * self.size
@@ -37,46 +38,48 @@ class ndarray:
             b = [other.data] * self.size
         elif isinstance(other, list):
             other_shape = calc_shape(other)
-            if not binary_operable(self.shape, other_shape):
+            is_operable, new_shape = binary_operable(self.shape, other_shape)
+            if not is_operable:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = ndarray(list).flatten().data
-        else:
+        else:  # isinstance(other, ndarray)
             other_shape = other.shape
-            if not binary_operable(self.shape, other.shape):
+            is_operable, new_shape = binary_operable(self.shape, other.shape)
+            if not is_operable:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other_shape}')
             b = other.flatten().data
 
-        return a, b
+        return a, b, new_shape
 
     def __add__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x + y for x, y in zip(a, b)]).reshape(self.shape)
+        return ndarray([x + y for x, y in zip(a, b)]).reshape(new_shape)
 
     def __radd__(self, other: Numbers) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x + y for x, y in zip(b, a)]).reshape(self.shape)
+        return ndarray([x + y for x, y in zip(b, a)]).reshape(new_shape)
 
     def __sub__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x - y for x, y in zip(a, b)]).reshape(self.shape)
+        return ndarray([x - y for x, y in zip(a, b)]).reshape(new_shape)
 
     def __rsub__(self, other: Numbers) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x - y for x, y in zip(b, a)]).reshape(self.shape)
+        return ndarray([x - y for x, y in zip(b, a)]).reshape(new_shape)
 
     def __mul__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x * y for x, y in zip(a, b)]).reshape(self.shape)
+        return ndarray([x * y for x, y in zip(a, b)]).reshape(new_shape)
 
     def __rmul__(self, other: Numbers) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x * y for x, y in zip(b, a)]).reshape(self.shape)
+        return ndarray([x * y for x, y in zip(b, a)]).reshape(new_shape)
 
     def __matmul__(self, other: 'ndarray') -> 'ndarray':
         if len(self.shape) < 1:
@@ -131,24 +134,24 @@ class ndarray:
         return m
 
     def __truediv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x / y for x, y in zip(a, b)]).reshape(self.shape)
+        return ndarray([x / y for x, y in zip(a, b)]).reshape(new_shape)
 
     def __rtruediv__(self, other: Numbers) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x / y for x, y in zip(b, a)]).reshape(self.shape)
+        return ndarray([x / y for x, y in zip(b, a)]).reshape(new_shape)
 
     def __floordiv__(self, other: Union[Numbers, 'ndarray']) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x // y for x, y in zip(a, b)]).reshape(self.shape)
+        return ndarray([x // y for x, y in zip(a, b)]).reshape(new_shape)
 
     def __rfloordiv__(self, other: Numbers) -> 'ndarray':
-        a, b = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_operations(other)
 
-        return ndarray([x // y for x, y in zip(b, a)]).reshape(self.shape)
+        return ndarray([x // y for x, y in zip(b, a)]).reshape(new_shape)
 
     def __len__(self) -> int:
         return len(self.data)
@@ -340,27 +343,42 @@ def is_number(n: Any):
     return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
 
 
-def binary_operable(shape_a: Union[int, List[int], Tuple[int]], shape_b: Union[int, List[int], Tuple[int]]) -> bool:
-    if is_number(shape_a):
-        return True
-
-    if is_number(shape_b):
-        return True
-
+def binary_operable(shape_a: Union[List[int], Tuple[int]], shape_b: Union[List[int], Tuple[int]]) -> Tuple[bool, List[int]]:
     shape_a = list(shape_a)
     shape_b = list(shape_b)
 
+    if calc_size(shape_a) == 1 or calc_size(shape_b) == 1:
+        if len(shape_a) >= len(shape_b):
+            for _ in range(len(shape_a) - len(shape_b)):
+                shape_b.append(1)
+        else:
+            for _ in range(len(shape_b) - len(shape_a)):
+                shape_a.append(1)
+
     if shape_a == shape_b:
-        return True
+        return True, shape_a
+
+    # XXX: very simple version
+    if len(shape_a) != len(shape_b):
+        return False, []
+
+    new_shape = []
+    for dim1, dim2 in zip(shape_a, shape_b):
+        if dim1 == 1:
+            new_shape.append(dim2)
+        elif dim2 == 1:
+            new_shape.append(dim1)
+        else:
+            return False, []
 
     # operable if broadcast
-    # XXX: very simple version
-    return (shape_a[1:] == shape_b[1:]) and (shape_a[0] == 1 or shape_b[0] == 1)
+    return True, new_shape
 
 
 def broadcast(a, shape: Union[List[int], Tuple[int]]) -> 'ndarray':
     # XXX: very simple version
-    if binary_operable(a.shape, shape) or a.shape[0] != 1:
+    is_operable, new_shape = binary_operable(a.shape, shape)
+    if is_operable or a.shape[0] != 1:
         return a
 
     n = shape[0]
