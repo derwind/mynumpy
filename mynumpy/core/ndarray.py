@@ -33,10 +33,12 @@ class ndarray:
 
     def _prepare_operations(self, other: Numbers | ndarray) -> tuple[list[int], list[int], list[int]]:
         new_shape = list(self.shape)
-        a = self.flatten().data
+
         if is_number(other):
+            a = self.flatten().data
             b = [other] * self.size
-        elif isinstance(other, ndarray) and is_number(other.data):
+        elif isinstance(other, ndarray) and is_number(other.data):  # scaler
+            a = self.flatten().data
             b = [other.data] * self.size
         elif isinstance(other, list) or isinstance(other, ndarray):
             if isinstance(other, list):
@@ -44,7 +46,10 @@ class ndarray:
             is_operable, new_shape = binary_operable(self.shape, other.shape)
             if not is_operable:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other.shape}')
-            b = other.flatten().data
+            a = broadcast(self, new_shape)
+            b = broadcast(other, new_shape)
+            a = a.flatten().data
+            b = b.flatten().data
         else:
             raise TypeError('ufunc did not contain a loop with signature matching types')
 
@@ -383,21 +388,20 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
         a = ndarray(data)
 
     data = copy.deepcopy(a.data)
-    new_data = []
 
     def walk(data, shape):
         if not isinstance(data[0], list):
-            if len(data) == 1 and len(shape[0]) > 1:
+            if len(data) == 1 and shape[0] > 1:
                 v = data[0]
-                for _ in range(len(shape[0]) - 1):
+                for _ in range(shape[0] - 1):
                     data.append(v)
             return
 
         for subdata in data:
             walk(subdata, shape[1:])
-        if len(data) == 1 and len(shape[0]) > 1:
+        if len(data) == 1 and shape[0] > 1:
             v = data[0]
-            for _ in range(len(shape[0]) - 1):
+            for _ in range(shape[0] - 1):
                 data.append(copy.deepcopy(v))
 
     walk(data, shape)
