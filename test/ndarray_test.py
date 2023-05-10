@@ -1007,6 +1007,47 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        a = mynp.array([
+            [1],
+            [2]
+        ])
+
+        b = mynp.array([
+            [
+                [1, 2, 3]
+            ],
+            [
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9]
+            ],
+            [
+                [10, 11, 12]
+            ]
+        ])
+
+        self.assertEqual((a + b).data, [
+            [
+                [
+                    [2, 3, 4],
+                    [3, 4, 5]
+                ],
+                [
+                    [5, 6, 7],
+                    [6, 7, 8]
+                ],
+                [
+                    [8, 9, 10],
+                    [9, 10, 11]
+                ],
+                [
+                    [11, 12, 13],
+                    [12, 13, 14]
+                ]
+            ]
+        ])
+
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
             a = mynp.array(data)
@@ -1019,6 +1060,14 @@ class TestNdArray(unittest.TestCase):
             a = mynp.array(data)
             data2 = [1, 2, 3, 4, 5]
             b = mynp.array(data2)
+            a + b
+
+        with self.assertRaises(ValueError):
+            a = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            b = mynp.array([1, 2, 3])
             a + b
 
     def test_radd(self):
@@ -1208,6 +1257,47 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        a = mynp.array([
+            [1],
+            [2]
+        ])
+
+        b = mynp.array([
+            [
+                [1, 2, 3]
+            ],
+            [
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9]
+            ],
+            [
+                [10, 11, 12]
+            ]
+        ])
+
+        self.assertEqual((a - b).data, [
+            [
+                [
+                    [0, -1, -2],
+                    [1, 0, -1]
+                ],
+                [
+                    [-3, -4, -5],
+                    [-2, -3, -4]
+                ],
+                [
+                    [-6, -7, -8],
+                    [-5, -6, -7]
+                ],
+                [
+                    [-9, -10, -11],
+                    [-8, -9, -10]
+                ]
+            ]
+        ])
+
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
             a = mynp.array(data)
@@ -1221,6 +1311,14 @@ class TestNdArray(unittest.TestCase):
             data2 = [1, 2, 3, 4, 5]
             b = mynp.array(data2)
             a - b
+
+        with self.assertRaises(ValueError):
+            a = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            b = mynp.array([1, 2, 3])
+            a + b
 
     def test_mul(self):
         data = 3
@@ -1343,6 +1441,47 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        a = mynp.array([
+            [1],
+            [2]
+        ])
+
+        b = mynp.array([
+            [
+                [1, 2, 3]
+            ],
+            [
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9]
+            ],
+            [
+                [10, 11, 12]
+            ]
+        ])
+
+        self.assertEqual((a * b).data, [
+            [
+                [
+                    [1, 2, 3],
+                    [2, 4, 6]
+                ],
+                [
+                    [4, 5, 6],
+                    [8, 10, 12]
+                ],
+                [
+                    [7, 8, 9],
+                    [14, 16, 18]
+                ],
+                [
+                    [10, 11, 12],
+                    [20, 22, 24]
+                ]
+            ]
+        ])
+
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
             a = mynp.array(data)
@@ -1355,6 +1494,14 @@ class TestNdArray(unittest.TestCase):
             a = mynp.array(data)
             data2 = [1, 2, 3, 4, 5]
             b = mynp.array(data2)
+            a * b
+
+        with self.assertRaises(ValueError):
+            a = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            b = mynp.array([1, 2, 3])
             a * b
 
     def test_truediv(self):
@@ -1478,6 +1625,47 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
+        a = mynp.array([
+            [1],
+            [2]
+        ])
+
+        b = mynp.array([
+            [
+                [1, 2, 3]
+            ],
+            [
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9]
+            ],
+            [
+                [10, 11, 12]
+            ]
+        ])
+
+        self.assertEqual((a / b).data, [
+            [
+                [
+                    [1., 0.5, 0.33333333],
+                    [2., 1., 0.66666667]
+                ],
+                [
+                    [0.25, 0.2, 0.16666667],
+                    [0.5, 0.4, 0.33333333]
+                ],
+                [
+                    [0.14285714, 0.125, 0.11111111],
+                    [0.28571429, 0.25, 0.22222222]
+                ],
+                [
+                    [0.1, 0.09090909, 0.08333333],
+                    [0.2, 0.18181818, 0.16666667]
+                ]
+            ]
+        ])
+
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
             a = mynp.array(data)
@@ -1490,6 +1678,14 @@ class TestNdArray(unittest.TestCase):
             a = mynp.array(data)
             data2 = [1, 2, 3, 4, 5]
             b = mynp.array(data2)
+            a / b
+
+        with self.assertRaises(ValueError):
+            a = mynp.array([
+                [1, 2],
+                [3, 4]
+            ])
+            b = mynp.array([1, 2, 3])
             a / b
 
     def test_matmul(self):
