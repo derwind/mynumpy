@@ -262,6 +262,8 @@ class ndarray:
             if shape[0] == 1:
                 data = [data]
 
+        assert calc_shape(data) == tuple(shape)
+
         return data
 
     def reshape(self, shape, *args) -> ndarray:
