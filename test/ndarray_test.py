@@ -380,6 +380,21 @@ class TestNdArray(unittest.TestCase):
             a.reshape((8, 7))
 
         data = [
+            [1, 2, 3],
+            [4, 5, 6]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(a.reshape((2, 1, 3)).data, [
+            [
+                [1, 2, 3]
+            ],
+            [
+                [4, 5, 6]
+            ]
+        ])
+
+        data = [
             [
                 [1, -2, 3],
                 [-4, 5, -6]
@@ -1885,6 +1900,14 @@ class TestNdArray(unittest.TestCase):
             [30, -42, -41],
             [55, 44, 43]
         ])
+
+        with self.assertRaises(IndexError):
+            a = mynp.array([
+                [1, 2],
+                [3, 4],
+                [5, 6]
+            ])
+            mynp.einsum('ii->', a)
 
         with self.assertRaises(ValueError):
             a = mynp.array([
