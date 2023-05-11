@@ -105,10 +105,12 @@ class ndarray:
         squeeze_count = 0
         need_transpose = False
         if len(a.shape) == 1:
+            # to a row vector of the matrix-form
             a = a.reshape((1, a.shape[0]))
             assert len(a.shape) == 2
             squeeze_count += 1
         if len(b.shape) == 1:
+            # to a col vector
             b = b.reshape((b.shape[0], 1))
             assert len(b.shape) == 2
             need_transpose = True
@@ -256,13 +258,11 @@ class ndarray:
         # confirmed valid shape
 
         data = self._flatten()
-        for d in reversed(shape[1:]):
-            if d != len(data):
-                data = list(split_list(data, d))
-            if shape[0] == 1:
-                data = [data]
+        for dim in reversed(shape[1:]):
+            data = list(split_list(data, dim))
+        # shape[0]'s dimesion should be automatically sufficed
 
-        assert calc_shape(data) == tuple(shape)
+        assert calc_shape(data) == tuple(shape), f'{calc_shape(data)} != {tuple(shape)}'
 
         return data
 
