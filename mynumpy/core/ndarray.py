@@ -377,7 +377,26 @@ def binary_operable(shape_a: list[int] | tuple[int], shape_b: list[int] | tuple[
     return True, new_shape
 
 
+def is_broadcastable(a: ndarray, shape: list[int] | tuple[int]) -> bool:
+    shape_a = list(a.shape)
+    shape = list(shape)
+
+    if len(shape_a) > len(shape):
+        return False
+    elif len(shape_a) < len(shape):
+        shape_a = [1] * (len(shape) - len(shape_a)) + shape_a
+
+    for dim1, dim2 in zip(shape_a, shape):
+        if dim1 != dim2 and dim1 != 1:
+            return False
+
+    return True
+
+
 def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
+    if not is_broadcastable(a, shape):
+        raise ValueError(f'could not broadcast input array from shape {a.shape} into shape {tuple(shape)}')
+
     shape = list(shape)
 
     if a.shape == tuple(shape):
