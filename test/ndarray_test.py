@@ -1930,3 +1930,64 @@ class TestNdArray(unittest.TestCase):
                 [-5, 3]
             ])
             mynp.einsum('i,jk->ik', a, b)
+
+    def test_getitem(self):
+        a = mynp.array([[[5]]])
+
+        self.assertEqual(a[0, 0, 0].data, 5)
+        self.assertEqual(a[:, :, :].data, [[[5]]])
+
+        a = mynp.array([
+            [1, 2],
+            [3, 4]
+        ])
+
+        self.assertEqual(a[0, :].data, [1, 2])
+        self.assertEqual(a[1, :].data, [3, 4])
+        self.assertEqual(a[:, 0].data, [1, 3])
+        self.assertEqual(a[:, 1].data, [2, 4])
+        self.assertEqual(a[:, :].data, [
+            [1, 2],
+            [3, 4]
+        ])
+
+        with self.assertRaises(IndexError):
+            a[:, :, :]
+
+        a = mynp.array([
+            [
+                [1, 2, 3],
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9],
+                [10, 11, 12]
+            ],
+        ])
+
+        self.assertEqual(a[:, :, :].data, [
+            [
+                [1, 2, 3],
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9],
+                [10, 11, 12]
+            ]
+        ])
+        self.assertEqual(a[:, 1].data, [
+            [4, 5, 6],
+            [10, 11, 12]
+        ])
+        self.assertEqual(a[:, :].data, [
+            [
+                [1, 2, 3],
+                [4, 5, 6]
+            ],
+            [
+                [7, 8, 9],
+                [10, 11, 12]
+            ]
+        ])
+        self.assertEqual(a[:, 1, 0].data, [4, 10])
+        self.assertEqual(a[1, 0, 2].data, 9)
