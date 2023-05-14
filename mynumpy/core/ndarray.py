@@ -31,6 +31,41 @@ class ndarray:
             return self.data != other
         return self.data != other.data
 
+    def __getitem__(self, key):
+        if isinstance(key, int) or isinstance(key, slice):
+            return self.data[key]
+
+        assert isinstance(key, tuple)
+
+        if len(key) > len(self.shape):
+            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+
+        shape = []
+        for i in range(len(self.shape)):
+            if i < len(key):
+                subkey = key[i]
+                if not isinstance(subkey, slice):
+                    continue
+                else:
+                    start = subkey.start or 0
+                    stop = subkey.stop or self.shape[i]
+                    step = subkey.step or 1
+                    shape.append(len(list(range(start, stop, step))))
+            else:
+                shape.append(self.shape[i])
+
+        return zeros(shape)
+
+    def __setitem__(self, key, value):
+        if isinstance(key, int) or isinstance(key, slice):
+            self.data[key] = value
+            return
+
+        assert isinstance(key, tuple)
+
+        if len(key) > len(self.shape):
+            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+
     def _prepare_operations(self, other: Numbers | ndarray) -> tuple[list[int], list[int], list[int]]:
         new_shape = list(self.shape)
 
