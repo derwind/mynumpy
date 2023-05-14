@@ -59,13 +59,13 @@ class ndarray:
                 shape.append(self.shape[i])
                 indices.append(list(range(self.shape[i])))
 
-        def walk(a: Numbers | list, indices: list[int], outputs: list[int]):
-            if is_number(a):
-                outputs.append(a)
+        def walk(data: Numbers | list, indices: list[int], outputs: list[int]):
+            if is_number(data):
+                outputs.append(data)
                 return
 
             for idx in indices[0]:
-                walk(a[idx], indices[1:], outputs)
+                walk(data[idx], indices[1:], outputs)
 
         outputs = []
         walk(self.data, indices, outputs)
@@ -81,6 +81,42 @@ class ndarray:
 
         if len(key) > len(self.shape):
             raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+
+        shape = []
+        indices = []
+        for i in range(len(self.shape)):
+            if i < len(key):
+                subkey = key[i]
+                if not isinstance(subkey, slice):
+                    indices.append([subkey])
+                    continue
+                else:
+                    start = subkey.start or 0
+                    stop = subkey.stop or self.shape[i]
+                    step = subkey.step or 1
+                    indice = list(range(start, stop, step))
+                    shape.append(len(indice))
+                    indices.append(indice)
+            else:
+                shape.append(self.shape[i])
+                indices.append(list(range(self.shape[i])))
+
+        if not isinstance(value, ndarray):
+            value = ndarray(value)
+        value = broadcast(value, shape).flatten().data
+
+        def walk(data: Numbers | list, indices: list[int], inputs: list[int]):
+            if is_number(data[0]):  # list of Numbers
+                for i in indices[0]:
+                    v = inputs[0]
+                    inputs[:] = inputs[1:]
+                    data[i] = v
+                return
+
+            for idx in indices[0]:
+                walk(data[idx], indices[1:], inputs)
+
+        walk(self.data, indices, value)
 
     def _prepare_operations(self, other: Numbers | ndarray) -> tuple[list[int], list[int], list[int]]:
         new_shape = list(self.shape)
