@@ -1942,6 +1942,10 @@ class TestNdArray(unittest.TestCase):
             [3, 4]
         ])
 
+        self.assertEqual(a[0, 0].data, 1)
+        self.assertEqual(a[0, 1].data, 2)
+        self.assertEqual(a[1, 0].data, 3)
+        self.assertEqual(a[1, 1].data, 4)
         self.assertEqual(a[0, :].data, [1, 2])
         self.assertEqual(a[1, :].data, [3, 4])
         self.assertEqual(a[:, 0].data, [1, 3])
@@ -1964,6 +1968,22 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ],
         ])
+
+        self.assertEqual(a[0, 0, 0].data, 1)
+        self.assertEqual(a[0, 0, 1].data, 2)
+        self.assertEqual(a[0, 0, 2].data, 3)
+        self.assertEqual(a[0, 1, 0].data, 4)
+        self.assertEqual(a[0, 1, 1].data, 5)
+        self.assertEqual(a[0, 1, 2].data, 6)
+        self.assertEqual(a[1, 0, 0].data, 7)
+        self.assertEqual(a[1, 0, 1].data, 8)
+        self.assertEqual(a[1, 0, 2].data, 9)
+        self.assertEqual(a[1, 1, 0].data, 10)
+        self.assertEqual(a[1, 1, 1].data, 11)
+        self.assertEqual(a[1, 1, 2].data, 12)
+
+        with self.assertRaises(IndexError):
+            a[1, 1, 3]
 
         self.assertEqual(a[:, :, :].data, [
             [
