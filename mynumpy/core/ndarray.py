@@ -31,6 +31,93 @@ class ndarray:
             return self.data != other
         return self.data != other.data
 
+    def __getitem__(self, key):
+        if isinstance(key, int) or isinstance(key, slice):
+            return self.data[key]
+
+        assert isinstance(key, tuple)
+
+        if len(key) > len(self.shape):
+            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+
+        shape = []
+        indices = []
+        for i in range(len(self.shape)):
+            if i < len(key):
+                subkey = key[i]
+                if not isinstance(subkey, slice):
+                    indices.append([subkey])
+                    continue
+                else:
+                    start = subkey.start or 0
+                    stop = subkey.stop or self.shape[i]
+                    step = subkey.step or 1
+                    indice = list(range(start, stop, step))
+                    shape.append(len(indice))
+                    indices.append(indice)
+            else:
+                shape.append(self.shape[i])
+                indices.append(list(range(self.shape[i])))
+
+        def walk(data: Numbers | list, indices: list[int], outputs: list[int]):
+            if is_number(data):
+                outputs.append(data)
+                return
+
+            for idx in indices[0]:
+                walk(data[idx], indices[1:], outputs)
+
+        outputs = []
+        walk(self.data, indices, outputs)
+
+        return ndarray(outputs).reshape(shape)
+
+    def __setitem__(self, key, value):
+        if isinstance(key, int) or isinstance(key, slice):
+            self.data[key] = value
+            return
+
+        assert isinstance(key, tuple)
+
+        if len(key) > len(self.shape):
+            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+
+        shape = []
+        indices = []
+        for i in range(len(self.shape)):
+            if i < len(key):
+                subkey = key[i]
+                if not isinstance(subkey, slice):
+                    indices.append([subkey])
+                    continue
+                else:
+                    start = subkey.start or 0
+                    stop = subkey.stop or self.shape[i]
+                    step = subkey.step or 1
+                    indice = list(range(start, stop, step))
+                    shape.append(len(indice))
+                    indices.append(indice)
+            else:
+                shape.append(self.shape[i])
+                indices.append(list(range(self.shape[i])))
+
+        if not isinstance(value, ndarray):
+            value = ndarray(value)
+        value = broadcast(value, shape).flatten().data
+
+        def walk(data: Numbers | list, indices: list[int], inputs: list[int]):
+            if is_number(data[0]):  # list of Numbers
+                for i in indices[0]:
+                    v = inputs[0]
+                    inputs[:] = inputs[1:]
+                    data[i] = v
+                return
+
+            for idx in indices[0]:
+                walk(data[idx], indices[1:], inputs)
+
+        walk(self.data, indices, value)
+
     def _prepare_operations(self, other: Numbers | ndarray) -> tuple[list[int], list[int], list[int]]:
         new_shape = list(self.shape)
 
@@ -377,7 +464,26 @@ def binary_operable(shape_a: list[int] | tuple[int], shape_b: list[int] | tuple[
     return True, new_shape
 
 
+def is_broadcastable(a: ndarray, shape: list[int] | tuple[int]) -> bool:
+    shape_a = list(a.shape)
+    shape = list(shape)
+
+    if len(shape_a) > len(shape):
+        return False
+    elif len(shape_a) < len(shape):
+        shape_a = [1] * (len(shape) - len(shape_a)) + shape_a
+
+    for dim1, dim2 in zip(shape_a, shape):
+        if dim1 != dim2 and dim1 != 1:
+            return False
+
+    return True
+
+
 def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
+    if not is_broadcastable(a, shape):
+        raise ValueError(f'could not broadcast input array from shape {a.shape} into shape {tuple(shape)}')
+
     shape = list(shape)
 
     if a.shape == tuple(shape):
