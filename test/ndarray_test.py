@@ -8,6 +8,10 @@ class TestNdArray(unittest.TestCase):
     def tearDown(self):
         ...
 
+    def test_create_ndarray(self):
+        a = mynp.ndarray((3,))
+        self.assertEqual(len(a.data), 3)
+
     def test_create(self):
         data = 3
         a = mynp.array(data)

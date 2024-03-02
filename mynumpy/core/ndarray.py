@@ -1,15 +1,26 @@
 from __future__ import annotations
 
 import copy
+import random
 from typing import Dict, Any
 from ..dtypes import Numbers
 
 
 class ndarray:
-    def __init__(self, data: Numbers | list[Numbers]):
-        self.data = data
-        self._shape = calc_shape(self.data)
-        self._size = calc_size(self._shape)
+    def __init__(self, shape, dtype: type = float, data: Numbers | list[Numbers] | None = None):
+        self._size = calc_size(shape)
+        self._shape = (self._size,)  # temporary shape
+
+        # make flat data and convert to specified type
+        if data is None:
+            self.data = [dtype((random.random() - 0.5) * 2) for _ in range(self._size)]
+        else:
+            self.data = ndarray._flatten(data, dtype)
+
+        # reshape to specified shape
+        self.data = self._reshape(shape)
+        self._dtype = dtype
+        self._shape = shape
 
     def __str__(self) -> str:
         return f'ndarray({str(self.data)})'
@@ -70,7 +81,7 @@ class ndarray:
         outputs = []
         walk(self.data, indices, outputs)
 
-        return ndarray(outputs).reshape(shape)
+        return ndarray(calc_shape(outputs), self.dtype, outputs)
 
     def __setitem__(self, key, value):
         if isinstance(key, int) or isinstance(key, slice):
@@ -102,7 +113,7 @@ class ndarray:
                 indices.append(list(range(self.shape[i])))
 
         if not isinstance(value, ndarray):
-            value = ndarray(value)
+            value = ndarray(calc_shape(value), self.dtype, value)
         value = broadcast(value, shape).flatten().data
 
         def walk(data: Numbers | list, indices: list[int], inputs: list[int]):
@@ -129,7 +140,7 @@ class ndarray:
             b = [other.data] * self.size
         elif isinstance(other, list) or isinstance(other, ndarray):
             if isinstance(other, list):
-                other = ndarray(other)
+                other = ndarray(calc_shape(other), self.dtype, other)
             is_operable, new_shape = binary_operable(self.shape, other.shape)
             if not is_operable:
                 raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other.shape}')
@@ -144,33 +155,33 @@ class ndarray:
 
     def __add__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x + y for x, y in zip(a, b)]).reshape(new_shape)
+        data = [x + y for x, y in zip(a, b)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __radd__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x + y for x, y in zip(b, a)]).reshape(new_shape)
+        data = [x + y for x, y in zip(b, a)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __sub__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x - y for x, y in zip(a, b)]).reshape(new_shape)
+        data = [x - y for x, y in zip(a, b)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __rsub__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x - y for x, y in zip(b, a)]).reshape(new_shape)
+        data = [x - y for x, y in zip(b, a)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __mul__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x * y for x, y in zip(a, b)]).reshape(new_shape)
+        data = [x * y for x, y in zip(a, b)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __rmul__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x * y for x, y in zip(b, a)]).reshape(new_shape)
+        data = [x * y for x, y in zip(b, a)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __matmul__(self, other: ndarray) -> ndarray:
         if len(self.shape) < 1:
@@ -217,34 +228,34 @@ class ndarray:
                 for i in range(a.shape[1]):
                     placeholder[r][c] += a.data[r][i] * b.data[i][c]
 
-        m = ndarray(placeholder).reshape(n_row, n_col)
+        m = ndarray(calc_shape(placeholder), self.dtype, placeholder).reshape(n_row, n_col)
         if need_transpose:
             m = m.T
         while squeeze_count > 0:
-            m = ndarray(m.data[0])
+            m = ndarray(calc_shape(m.data[0]), self.dtype, m.data[0])
             squeeze_count -= 1
 
         return m
 
     def __truediv__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x / y for x, y in zip(a, b)]).reshape(new_shape)
+        data = [x / y for x, y in zip(a, b)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __rtruediv__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x / y for x, y in zip(b, a)]).reshape(new_shape)
+        data = [x / y for x, y in zip(b, a)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __floordiv__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x // y for x, y in zip(a, b)]).reshape(new_shape)
+        data = [x // y for x, y in zip(a, b)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __rfloordiv__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
-
-        return ndarray([x // y for x, y in zip(b, a)]).reshape(new_shape)
+        data = [x // y for x, y in zip(b, a)]
+        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
 
     def __len__(self) -> int:
         return len(self.data)
@@ -256,6 +267,10 @@ class ndarray:
     @property
     def shape(self) -> tuple[int]:
         return self._shape
+
+    @property
+    def dtype(self) -> type:
+        return self._dtype
 
     @property
     def size(self) -> int:
@@ -287,7 +302,7 @@ class ndarray:
         indices = []
         calc_target_indices(self.data, indices)
 
-        flat_data = self._flatten()
+        flat_data = ndarray._flatten(self.data)
 
         for d, index in zip(flat_data, indices):
             target = placeholder
@@ -299,21 +314,26 @@ class ndarray:
 
     @property
     def T(self) -> ndarray:
-        return ndarray(self._transpose())
+        data = self._transpose()
+        return ndarray(calc_shape(data), self.dtype, data)
 
-    def _flatten(self) -> list[Numbers]:
-        def walk(data, list_):
+    @classmethod
+    def _flatten(cls, data: Numbers | list[Numbers], dtype: type | None = None) -> list[Numbers]:
+        def walk(data, list_, dtype=None):
             if not isinstance(data, list):
+                if dtype is not None:
+                    data = dtype(data)
                 list_.append(data)
                 return list_
             for subdata in data:
-                list_ = walk(subdata, list_)
+                list_ = walk(subdata, list_, dtype)
             return list_
 
-        return walk(self.data, [])
+        return walk(data, [], dtype)
 
     def flatten(self) -> ndarray:
-        return ndarray(self._flatten())
+        data = ndarray._flatten(self.data)
+        return ndarray(calc_shape(data), self.dtype, data)
 
     def _reshape(self, shape, *args) -> list[Numbers]:
         def split_list(l, n):
@@ -344,7 +364,7 @@ class ndarray:
 
         # confirmed valid shape
 
-        data = self._flatten()
+        data = ndarray._flatten(self.data)
         for dim in reversed(shape[1:]):
             data = list(split_list(data, dim))
         # shape[0]'s dimesion should be automatically sufficed
@@ -354,7 +374,8 @@ class ndarray:
         return data
 
     def reshape(self, shape, *args) -> ndarray:
-        return ndarray(self._reshape(shape, *args))
+        data = self._reshape(shape, *args)
+        return ndarray(calc_shape(data), self.dtype, data)
 
     def item(self) -> Numbers:
         if is_number(self.data):
@@ -392,21 +413,21 @@ def calc_size(shape: int | list[int] | tuple[int], *args) -> int:
 def _numbers(shape: int | list[int] | tuple[int], n: Numbers) -> list[int]:
     if isinstance(shape, int):
         shape = [shape]
-
-    return ndarray([n] * calc_size(shape))._reshape(shape)
+    data = [n] * calc_size(shape)
+    return data
 
 
 def _zeros(shape: int | list[int] | tuple[int]) -> list[int]:
     return _numbers(shape, 0)
 
 
-def zeros(shape) -> ndarray:
-    return ndarray(_zeros(shape))
+def zeros(shape, dtype: type = float) -> ndarray:
+    return ndarray(shape, dtype, _zeros(shape))
 
 
 def zeros_like(a) -> ndarray:
     if is_number(a):
-        return ndarray(0)
+        return ndarray((), type(a), 0)
     elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
@@ -418,13 +439,13 @@ def _ones(shape: int | list[int] | tuple[int]) -> list[int]:
     return _numbers(shape, 1)
 
 
-def ones(shape) -> ndarray:
-    return ndarray(_ones(shape))
+def ones(shape, dtype: type = float) -> ndarray:
+    return ndarray(shape, dtype, _ones(shape))
 
 
 def ones_like(a) -> ndarray:
     if is_number(a):
-        return ndarray(1)
+        return ndarray((), type(a), 1)
     elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
@@ -493,7 +514,7 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
         data = copy.deepcopy(a.data)
         for _ in range(len(shape) - len(a.shape)):
             data = [data]
-        a = ndarray(data)
+        a = ndarray(calc_shape(data), a.dtype, data)
 
     data = copy.deepcopy(a.data)
 
@@ -514,7 +535,7 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
 
     walk(data, shape)
 
-    a = ndarray(data)
+    a = ndarray(calc_shape(data), a.dtype, data)
     assert a.shape == tuple(shape)
 
     return a
@@ -649,4 +670,4 @@ def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
 
     placeholder = fill_placeholder(placeholder, to_index)
 
-    return ndarray(placeholder)
+    return ndarray(calc_shape(placeholder), operands[0].dtype, placeholder)
