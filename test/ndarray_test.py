@@ -8,6 +8,13 @@ class TestNdArray(unittest.TestCase):
     def tearDown(self):
         ...
 
+    def test_create_ndarray(self):
+        a = mynp.ndarray(3)
+        self.assertEqual(len(a.data), 3)
+
+        a = mynp.ndarray((3,))
+        self.assertEqual(len(a.data), 3)
+
     def test_create(self):
         data = 3
         a = mynp.array(data)
@@ -39,6 +46,50 @@ class TestNdArray(unittest.TestCase):
         a = mynp.array(data)
 
         self.assertEqual(data, a.data)
+
+        data = [
+            [
+                [1, -2],
+                [-3, 4]
+            ],
+            [
+                [-5, 6],
+                [7, -8]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(data, a.data)
+
+        a = mynp.array(data, dtype=float)
+
+        answer = [
+            [
+                [1., -2.],
+                [-3., 4.]
+            ],
+            [
+                [-5., 6.],
+                [7., -8.]
+            ]
+        ]
+
+        self.assertEqual(answer, a.data)
+
+        a = mynp.array(data, dtype=complex)
+
+        answer = [
+            [
+                [1. + 0j, -2. + 0j],
+                [-3. + 0j, 4. + 0j]
+            ],
+            [
+                [-5. + 0j, 6. + 0j],
+                [7. + 0j, -8. + 0j]
+            ]
+        ]
+
+        self.assertEqual(answer, a.data)
 
     def test_eq(self):
         data = 3
@@ -1934,6 +1985,7 @@ class TestNdArray(unittest.TestCase):
     def test_getitem(self):
         a = mynp.array([[[5]]])
 
+        self.assertEqual(a[0][0][0], 5)
         self.assertEqual(a[0, 0, 0].data, 5)
         self.assertEqual(a[:, :, :].data, [[[5]]])
 
