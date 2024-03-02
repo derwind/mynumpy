@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import copy
 import random
-from typing import Dict, Any
+from typing import Any, Dict
+
 from ..dtypes import Numbers
 
 
@@ -88,6 +89,10 @@ class ndarray:
         return ndarray(shape, self.dtype, outputs)
 
     def __setitem__(self, key, value):
+        if isinstance(value, ndarray) and not value.shape:  # scaler
+            # temporaryly explicitly convert to a scaler
+            value = value.item()
+
         if isinstance(key, int) or isinstance(key, slice):
             self.data[key] = value
             return
@@ -333,6 +338,14 @@ class ndarray:
         data = self._transpose()
         return ndarray(calc_shape(data), self.dtype, data)
 
+    @property
+    def real(self) -> ndarray:
+        typ = _guess_dtype(self.data)
+        if typ == int or typ == float:
+            return self
+        flat_data = [v.real for v in ndarray._flatten(self.data)]
+        return ndarray(self.shape, float, flat_data)
+
     @classmethod
     def _flatten(
         cls, data: Numbers | list[Numbers], dtype: type | None = None
@@ -368,18 +381,25 @@ class ndarray:
         if not shape and self.size == 1:
             return self.item()
 
-        if shape[0] != -1:
+        auto_dim = None
+        for i, dim in enumerate(shape):
+            if dim == -1:
+                if auto_dim is not None:
+                    raise ValueError("can only specify one unknown dimension")
+                auto_dim = i
+
+        if auto_dim is None:
             if self.size != calc_size(shape):
                 raise ValueError(
                     f"cannot reshape array of size {self.size} into shape {tuple(shape)}"
                 )
-        elif shape[0] == -1:
-            subsize = calc_size(shape[1:])
+        else:
+            subsize = -calc_size(shape)
             if self.size % subsize != 0:
                 raise ValueError(
                     f"cannot reshape array of size {self.size} into shape {tuple(shape)}"
                 )
-            shape[0] = self.size // subsize
+            shape[auto_dim] = self.size // subsize
 
         if self.size % calc_size(shape) != 0:
             raise ValueError(
@@ -765,12 +785,34 @@ def _make_indices(from_components: list[str], to_index: str) -> tuple[str, str, 
     return left_index, right_index, "".join(chars)
 
 
-def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
+def _guess_dtype(data: Numbers | list[Numbers]) -> type:
+    if is_number(data):
+        return type(data)
+
+    if isinstance(data[0], list):
+        return _guess_dtype(data[0])
+    return type(data[0])
+
+
+def einsum(subscripts: str, *operands: list[list] | list[ndarray]) -> ndarray:
     # e.g. "Aa,aBb,bC->ABC" => "Aa,aBb->ABb" & "ABb,bC->ABC"
     # e.g. "Aa,aBb,bCc,cD->ABCD" => "Aa,aBb->ABb" & "ABb,bCc->ABCc" & "ABCc,cD->ABCD"
 
     if len(operands) <= 2:
         return _einsum2(subscripts, *operands)
+
+    # convert operands to a ndarray list
+    operands_ = operands
+    operands = []
+    for operand in operands_:
+        if isinstance(operand, list):
+            operands.append(
+                ndarray(calc_shape(operand), _guess_dtype(operand[0]), operand)
+            )
+        elif isinstance(operand, ndarray):
+            operands.append(operand)
+        else:
+            raise ValueError("operands must be list of ndarray or list")
 
     from_indices, to_index = subscripts.split("->")
     from_comps = from_indices.split(",")

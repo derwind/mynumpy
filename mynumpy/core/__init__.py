@@ -1,2 +1,3 @@
 from .array import array
-from .ndarray import ndarray, zeros, zeros_like, ones, ones_like, einsum
+from .fromnumeric import prod
+from .ndarray import einsum, ndarray, ones, ones_like, zeros, zeros_like
