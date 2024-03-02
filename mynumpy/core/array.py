@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy as copy_
 from typing import List
 from .ndarray import ndarray, calc_shape, is_number
