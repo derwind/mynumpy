@@ -47,6 +47,50 @@ class TestNdArray(unittest.TestCase):
 
         self.assertEqual(data, a.data)
 
+        data = [
+            [
+                [1, -2],
+                [-3, 4]
+            ],
+            [
+                [-5, 6],
+                [7, -8]
+            ]
+        ]
+        a = mynp.array(data)
+
+        self.assertEqual(data, a.data)
+
+        a = mynp.array(data, dtype=float)
+
+        answer = [
+            [
+                [1., -2.],
+                [-3., 4.]
+            ],
+            [
+                [-5., 6.],
+                [7., -8.]
+            ]
+        ]
+
+        self.assertEqual(answer, a.data)
+
+        a = mynp.array(data, dtype=complex)
+
+        answer = [
+            [
+                [1. + 0j, -2. + 0j],
+                [-3. + 0j, 4. + 0j]
+            ],
+            [
+                [-5. + 0j, 6. + 0j],
+                [7. + 0j, -8. + 0j]
+            ]
+        ]
+
+        self.assertEqual(answer, a.data)
+
     def test_eq(self):
         data = 3
         a = mynp.array(data)
