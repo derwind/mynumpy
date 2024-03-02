@@ -20,7 +20,7 @@ class ndarray:
         # reshape to specified shape
         self.data = self._reshape(shape)
         self._dtype = dtype
-        self._shape = shape
+        self._shape = shape  # overwrite shape with specified shape
 
     def __str__(self) -> str:
         return f'ndarray({str(self.data)})'
@@ -81,7 +81,7 @@ class ndarray:
         outputs = []
         walk(self.data, indices, outputs)
 
-        return ndarray(calc_shape(outputs), self.dtype, outputs)
+        return ndarray(shape, self.dtype, outputs)
 
     def __setitem__(self, key, value):
         if isinstance(key, int) or isinstance(key, slice):
@@ -276,7 +276,7 @@ class ndarray:
     def size(self) -> int:
         return self._size
 
-    def _transpose(self) -> list[Numbers]:
+    def _transpose(self) -> Numbers | list[Numbers]:
         if is_number(self.data):
             return self.data
 
@@ -410,11 +410,11 @@ def calc_size(shape: int | list[int] | tuple[int], *args) -> int:
     return size
 
 
-def _numbers(shape: int | list[int] | tuple[int], n: Numbers) -> list[int]:
+def _numbers(shape: int | list[int] | tuple[int], n: Numbers) -> list[Numbers]:
     if isinstance(shape, int):
         shape = [shape]
     data = [n] * calc_size(shape)
-    return data
+    return ndarray(shape, type(n), data).data
 
 
 def _zeros(shape: int | list[int] | tuple[int]) -> list[int]:

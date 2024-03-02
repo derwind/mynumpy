@@ -9,6 +9,9 @@ class TestNdArray(unittest.TestCase):
         ...
 
     def test_create_ndarray(self):
+        a = mynp.ndarray(3)
+        self.assertEqual(len(a.data), 3)
+
         a = mynp.ndarray((3,))
         self.assertEqual(len(a.data), 3)
 
@@ -1938,6 +1941,7 @@ class TestNdArray(unittest.TestCase):
     def test_getitem(self):
         a = mynp.array([[[5]]])
 
+        self.assertEqual(a[0][0][0], 5)
         self.assertEqual(a[0, 0, 0].data, 5)
         self.assertEqual(a[:, :, :].data, [[[5]]])
 
