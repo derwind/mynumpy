@@ -469,14 +469,17 @@ def zeros(shape, dtype: type = float) -> ndarray:
     return ndarray(shape, dtype, _zeros(shape))
 
 
-def zeros_like(a) -> ndarray:
+def zeros_like(a, dtype: type | None = None) -> ndarray:
     if is_number(a):
         return ndarray((), type(a), 0)
     elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
 
-    return zeros(shape)
+    if dtype is None:
+        dtype = _guess_dtype(a)
+
+    return zeros(shape, dtype)
 
 
 def _ones(shape: int | list[int] | tuple[int]) -> list[int]:
@@ -487,14 +490,17 @@ def ones(shape, dtype: type = float) -> ndarray:
     return ndarray(shape, dtype, _ones(shape))
 
 
-def ones_like(a) -> ndarray:
+def ones_like(a, dtype: type | None = None) -> ndarray:
     if is_number(a):
         return ndarray((), type(a), 1)
     elif isinstance(a, ndarray):
         a = a.data
     shape = calc_shape(a)
 
-    return ones(shape)
+    if dtype is None:
+        dtype = _guess_dtype(a)
+
+    return ones(shape, dtype)
 
 
 def is_number(n: Any):
