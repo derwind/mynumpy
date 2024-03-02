@@ -156,32 +156,32 @@ class ndarray:
     def __add__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x + y for x, y in zip(a, b)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __radd__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x + y for x, y in zip(b, a)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __sub__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x - y for x, y in zip(a, b)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __rsub__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x - y for x, y in zip(b, a)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __mul__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x * y for x, y in zip(a, b)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __rmul__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x * y for x, y in zip(b, a)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __matmul__(self, other: ndarray) -> ndarray:
         if len(self.shape) < 1:
@@ -228,7 +228,7 @@ class ndarray:
                 for i in range(a.shape[1]):
                     placeholder[r][c] += a.data[r][i] * b.data[i][c]
 
-        m = ndarray(calc_shape(placeholder), self.dtype, placeholder).reshape(n_row, n_col)
+        m = ndarray((n_row, n_col), self.dtype, placeholder)
         if need_transpose:
             m = m.T
         while squeeze_count > 0:
@@ -240,22 +240,22 @@ class ndarray:
     def __truediv__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x / y for x, y in zip(a, b)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __rtruediv__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x / y for x, y in zip(b, a)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __floordiv__(self, other: Numbers | ndarray) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x // y for x, y in zip(a, b)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __rfloordiv__(self, other: Numbers) -> ndarray:
         a, b, new_shape = self._prepare_operations(other)
         data = [x // y for x, y in zip(b, a)]
-        return ndarray(calc_shape(data), type(data[0]), data).reshape(new_shape)
+        return ndarray(new_shape, type(data[0]), data)
 
     def __len__(self) -> int:
         return len(self.data)
