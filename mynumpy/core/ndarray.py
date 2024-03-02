@@ -569,7 +569,7 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
     return a
 
 
-def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
+def _einsum2(subscripts: str, *operands: list[ndarray]) -> ndarray:
     subscripts = subscripts.replace(" ", "")
 
     from_indices, to_index = subscripts.split("->")
@@ -737,3 +737,55 @@ def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
     placeholder = fill_placeholder(placeholder, to_index)
 
     return ndarray(calc_shape(placeholder), operands[0].dtype, placeholder)
+
+
+def _make_indices(from_components: list[str], to_index: str) -> tuple[str, str, str]:
+    if len(from_components) < 2:
+        raise ValueError("from_components must contain at least two components")
+
+    if len(from_components) == 2:
+        return from_components[0], from_components[1], to_index
+
+    left_index = from_components[0]
+    right_index = from_components[1]
+
+    chars = set(left_index) | set(right_index)
+
+    virtual_indices = set()
+    for c in chars:
+        found = False
+        for comps in from_components[2:]:
+            if c in comps:
+                found = True
+                break
+        if not found and c not in to_index:
+            virtual_indices.add(c)
+    chars = chars - virtual_indices
+
+    return left_index, right_index, "".join(chars)
+
+
+def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
+    # e.g. "Aa,aBb,bC->ABC" => "Aa,aBb->ABb" & "ABb,bC->ABC"
+    # e.g. "Aa,aBb,bCc,cD->ABCD" => "Aa,aBb->ABb" & "ABb,bCc->ABCc" & "ABCc,cD->ABCD"
+
+    if len(operands) <= 2:
+        return _einsum2(subscripts, *operands)
+
+    from_indices, to_index = subscripts.split("->")
+    from_comps = from_indices.split(",")
+    if len(from_comps) != len(operands):
+        raise ValueError(
+            "more operands provided to einstein sum function than specified in the subscripts string"
+        )
+
+    operand = operands[0]
+    indices = from_comps[0]
+    for i in range(1, len(operands)):
+        left_idx, right_idx, to_idx = _make_indices(
+            [indices] + from_comps[i:], to_index
+        )
+        intermediate_subscripts = f"{left_idx},{right_idx}->{to_idx}"
+        operand = _einsum2(intermediate_subscripts, operand, operands[i])
+        indices = to_idx
+    return operand

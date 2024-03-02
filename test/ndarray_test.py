@@ -1872,6 +1872,8 @@ class TestNdArray(unittest.TestCase):
 
         self.assertEqual(mynp.einsum('ij,ij->', a, b).data, -4)
         self.assertEqual(mynp.einsum('ij,ji->', a, b).data, -5)
+        self.assertEqual(mynp.einsum('ij,ij->i', a, b).data, [7, -11])
+        self.assertEqual(mynp.einsum('ij,ij->j', a, b).data, [16, -20])
 
         a = mynp.array([1, 2])
 
@@ -1981,6 +1983,94 @@ class TestNdArray(unittest.TestCase):
                 [-5, 3]
             ])
             mynp.einsum('i,jk->ik', a, b)
+
+    def test_einsum_more_than_2_operands(self):
+        a = mynp.array([
+            [1, 2],
+            [3, 4],
+            [5, 6],
+        ])
+        b = mynp.array([
+            [-2, 1, -1, 3],
+            [-5, 3, 0, 2],
+        ])
+        c = mynp.array([
+            [0, 2, -3, 0],
+            [1, -1, 1, -1],
+            [4, -5, 6, -2],
+        ])
+
+        self.assertEqual(mynp.einsum('ij,jk,lk->il', a, b, c).data, [
+            [17, -27, -103],
+            [39, -61, -231],
+            [61, -95, -359],
+        ])
+
+        a = mynp.array([
+            [
+                [1, 2],
+                [3, 4],
+                [5, 6],
+            ],
+            [
+                [3, -4],
+                [-5, 6],
+                [1, -2],
+            ],
+            [
+                [0, 8],
+                [7, 0],
+                [-1, 6],
+            ],
+            [
+                [2, 4],
+                [6, 8],
+                [10, -12],
+            ],
+        ])
+        b = mynp.array([
+            [
+                [-2, 1, -1, 3],
+            ],
+            [
+                [-5, 3, 0, 2],
+            ]
+        ])
+        c = mynp.array([
+            [0, 2, -3, 0],
+            [1, -1, 1, -1],
+            [3, -5, 6, -2],
+            [2, -3, -2, 3],
+            [5, 9, 6, 3],
+        ])
+
+        self.assertEqual(mynp.einsum('ijk,kli,mi->mjl', a, b, c).data, [
+            [
+                [-18],
+                [47],
+                [-13],
+            ],
+            [
+                [-17],
+                [-80],
+                [-40],
+            ],
+            [
+                [-19],
+                [-253],
+                [-101],
+            ],
+            [
+                [45],
+                [25],
+                [-49],
+            ],
+            [
+                [ -99],
+                [47],
+                [-221],
+            ],
+        ])
 
     def test_getitem(self):
         a = mynp.array([[[5]]])
