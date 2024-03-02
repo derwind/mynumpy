@@ -7,7 +7,9 @@ from ..dtypes import Numbers
 
 
 class ndarray:
-    def __init__(self, shape, dtype: type = float, data: Numbers | list[Numbers] | None = None):
+    def __init__(
+        self, shape, dtype: type = float, data: Numbers | list[Numbers] | None = None
+    ):
         self._size = calc_size(shape)
         self._shape = (self._size,)  # temporary shape
 
@@ -23,10 +25,10 @@ class ndarray:
         self._shape = shape  # overwrite shape with specified shape
 
     def __str__(self) -> str:
-        return f'ndarray({str(self.data)})'
+        return f"ndarray({str(self.data)})"
 
     def __repr__(self) -> str:
-        return f'ndarray({str(self.data)})'
+        return f"ndarray({str(self.data)})"
 
     def __eq__(self, other: ndarray) -> bool:
         if not isinstance(other, ndarray) and not is_number(other):
@@ -49,7 +51,9 @@ class ndarray:
         assert isinstance(key, tuple)
 
         if len(key) > len(self.shape):
-            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+            raise IndexError(
+                f"too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed"
+            )
 
         shape = []
         indices = []
@@ -91,7 +95,9 @@ class ndarray:
         assert isinstance(key, tuple)
 
         if len(key) > len(self.shape):
-            raise IndexError(f'too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed')
+            raise IndexError(
+                f"too many indices for array: array is {len(self.shape)}-dimensional, but {len(key)} were indexed"
+            )
 
         shape = []
         indices = []
@@ -129,7 +135,9 @@ class ndarray:
 
         walk(self.data, indices, value)
 
-    def _prepare_operations(self, other: Numbers | ndarray) -> tuple[list[int], list[int], list[int]]:
+    def _prepare_operations(
+        self, other: Numbers | ndarray
+    ) -> tuple[list[int], list[int], list[int]]:
         new_shape = list(self.shape)
 
         if is_number(other):
@@ -143,13 +151,17 @@ class ndarray:
                 other = ndarray(calc_shape(other), self.dtype, other)
             is_operable, new_shape = binary_operable(self.shape, other.shape)
             if not is_operable:
-                raise ValueError(f'operands could not be broadcast together with shapes {self.shape} {other.shape}')
+                raise ValueError(
+                    f"operands could not be broadcast together with shapes {self.shape} {other.shape}"
+                )
             a = broadcast(self, new_shape)
             b = broadcast(other, new_shape)
             a = a.flatten().data
             b = b.flatten().data
         else:
-            raise TypeError('ufunc did not contain a loop with signature matching types')
+            raise TypeError(
+                "ufunc did not contain a loop with signature matching types"
+            )
 
         return a, b, new_shape
 
@@ -186,17 +198,21 @@ class ndarray:
     def __matmul__(self, other: ndarray) -> ndarray:
         if len(self.shape) < 1:
             raise ValueError(
-                f'matmul: Input operand 0 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)'
+                f"matmul: Input operand 0 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)"
             )
         if len(other.shape) < 1:
             raise ValueError(
-                f'matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)'
+                f"matmul: Input operand 1 does not have enough dimensions (has 0, gufunc core with signature (n?,k),(k,m?)->(n?,m?) requires 1)"
             )
 
         if len(self.shape) != 1 and len(self.shape) != 2:
-            raise ValueError(f'matmul: Input operand 0 is neither a vector nor a matrix and not supported')
+            raise ValueError(
+                f"matmul: Input operand 0 is neither a vector nor a matrix and not supported"
+            )
         if len(other.shape) != 1 and len(other.shape) != 2:
-            raise ValueError(f'matmul: Input operand 1 is neither a vector nor a matrix and not supported')
+            raise ValueError(
+                f"matmul: Input operand 1 is neither a vector nor a matrix and not supported"
+            )
 
         a = self
         b = other
@@ -216,7 +232,7 @@ class ndarray:
 
         if a.shape[1] != b.shape[0]:
             raise ValueError(
-                f'matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {b.shape[0]} is different from {a.shape[1]})'
+                f"matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size {b.shape[0]} is different from {a.shape[1]})"
             )
 
         n_row = a.shape[0]
@@ -318,7 +334,9 @@ class ndarray:
         return ndarray(calc_shape(data), self.dtype, data)
 
     @classmethod
-    def _flatten(cls, data: Numbers | list[Numbers], dtype: type | None = None) -> list[Numbers]:
+    def _flatten(
+        cls, data: Numbers | list[Numbers], dtype: type | None = None
+    ) -> list[Numbers]:
         def walk(data, list_, dtype=None):
             if not isinstance(data, list):
                 if dtype is not None:
@@ -352,15 +370,21 @@ class ndarray:
 
         if shape[0] != -1:
             if self.size != calc_size(shape):
-                raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
+                raise ValueError(
+                    f"cannot reshape array of size {self.size} into shape {tuple(shape)}"
+                )
         elif shape[0] == -1:
             subsize = calc_size(shape[1:])
             if self.size % subsize != 0:
-                raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
+                raise ValueError(
+                    f"cannot reshape array of size {self.size} into shape {tuple(shape)}"
+                )
             shape[0] = self.size // subsize
 
         if self.size % calc_size(shape) != 0:
-            raise ValueError(f'cannot reshape array of size {self.size} into shape {tuple(shape)}')
+            raise ValueError(
+                f"cannot reshape array of size {self.size} into shape {tuple(shape)}"
+            )
 
         # confirmed valid shape
 
@@ -369,7 +393,7 @@ class ndarray:
             data = list(split_list(data, dim))
         # shape[0]'s dimesion should be automatically sufficed
 
-        assert calc_shape(data) == tuple(shape), f'{calc_shape(data)} != {tuple(shape)}'
+        assert calc_shape(data) == tuple(shape), f"{calc_shape(data)} != {tuple(shape)}"
 
         return data
 
@@ -386,7 +410,7 @@ class ndarray:
                 data = data[0]
             return data
 
-        raise ValueError('can only convert an array of size 1 to a Python scalar')
+        raise ValueError("can only convert an array of size 1 to a Python scalar")
 
 
 def calc_shape(a: Numbers | list[int], dims: list[int] | None = None) -> list[int]:
@@ -457,7 +481,9 @@ def is_number(n: Any):
     return isinstance(n, int) or isinstance(n, float) or isinstance(n, complex)
 
 
-def binary_operable(shape_a: list[int] | tuple[int], shape_b: list[int] | tuple[int]) -> tuple[bool, list[int]]:
+def binary_operable(
+    shape_a: list[int] | tuple[int], shape_b: list[int] | tuple[int]
+) -> tuple[bool, list[int]]:
     shape_a = list(shape_a)
     shape_b = list(shape_b)
 
@@ -503,7 +529,9 @@ def is_broadcastable(a: ndarray, shape: list[int] | tuple[int]) -> bool:
 
 def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
     if not is_broadcastable(a, shape):
-        raise ValueError(f'could not broadcast input array from shape {a.shape} into shape {tuple(shape)}')
+        raise ValueError(
+            f"could not broadcast input array from shape {a.shape} into shape {tuple(shape)}"
+        )
 
     shape = list(shape)
 
@@ -542,30 +570,36 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
 
 
 def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
-    subscripts = subscripts.replace(' ', '')
+    subscripts = subscripts.replace(" ", "")
 
-    from_indices, to_index = subscripts.split('->')
-    if len(from_indices.split(',')) != len(operands):
-        raise ValueError('more operands provided to einstein sum function than specified in the subscripts string')
+    from_indices, to_index = subscripts.split("->")
+    if len(from_indices.split(",")) != len(operands):
+        raise ValueError(
+            "more operands provided to einstein sum function than specified in the subscripts string"
+        )
 
     if len(operands) == 1:
         # XXX: ad-hoc implementation
         op = operands[0]
         operands = [op, ones_like(op)]
-        from_indices = f'{from_indices},{from_indices}'
+        from_indices = f"{from_indices},{from_indices}"
 
-    index_list = [[idx for idx in index] for index in from_indices.split(',')]
+    index_list = [[idx for idx in index] for index in from_indices.split(",")]
     to_index = [idx for idx in to_index]
 
     for i, (op, index) in enumerate(zip(operands, index_list)):
         if len(op.shape) > len(index):
-            raise ValueError('operand has more dimensions than subscripts given in einstein sum')
+            raise ValueError(
+                "operand has more dimensions than subscripts given in einstein sum"
+            )
 
         if len(op.shape) < len(index):
-            raise ValueError(f'einstein sum subscripts string contains too many subscripts for operand {i}')
+            raise ValueError(
+                f"einstein sum subscripts string contains too many subscripts for operand {i}"
+            )
 
     if len(operands) > 2:
-        raise ValueError(f'operands whose length > 2 are currently not supported')
+        raise ValueError(f"operands whose length > 2 are currently not supported")
 
     a, b = operands
     index_a, index_b = index_list
@@ -590,13 +624,17 @@ def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
             out_shape.append(dim)
             i2d[idx] = dim
             continue
-        raise ValueError(f"einstein sum subscripts string included output subscript '{idx}' which never appeared in an input")
+        raise ValueError(
+            f"einstein sum subscripts string included output subscript '{idx}' which never appeared in an input"
+        )
 
     # Preprocess finished. Main process begins
 
     placeholder = zeros(out_shape).data
 
-    def fill_placeholder(target: list[int], index: list[str], index_kv: Dict[str, int] | None = None) -> list[int]:
+    def fill_placeholder(
+        target: list[int], index: list[str], index_kv: Dict[str, int] | None = None
+    ) -> list[int]:
         if index_kv is None:
             index_kv = {}
 
@@ -618,9 +656,22 @@ def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
         return target
 
     # e.g. 'ijkl,jmln->ikm': sum_j sum_l sum_n A_{ijkl} B_{jmln}
-    def calc_value(a_1: ndarray, a_2: ndarray, index_1: tuple[str, ...], index_2: tuple[str, ...], index_kv: Dict[str, int]):
+    def calc_value(
+        a_1: ndarray,
+        a_2: ndarray,
+        index_1: tuple[str, ...],
+        index_2: tuple[str, ...],
+        index_kv: Dict[str, int],
+    ):
         combinations_kv = []
-        calc_combinations(list(a_1.shape), list(a_2.shape), index_1, index_2, index_kv, combinations_kv)
+        calc_combinations(
+            list(a_1.shape),
+            list(a_2.shape),
+            index_1,
+            index_2,
+            index_kv,
+            combinations_kv,
+        )
 
         v = 0
         for idx_kv in combinations_kv:
@@ -631,37 +682,52 @@ def einsum(subscripts: str, *operands: list[ndarray]) -> ndarray:
         return v
 
     def calc_combinations(
-        shape_1: list[int], shape_2: list[int], index_1: list[str], index_2: list[str], index_kv: Dict[str, int], out_combs: list[Dict[str, int]]
+        shape_1: list[int],
+        shape_2: list[int],
+        index_1: list[str],
+        index_2: list[str],
+        index_kv: Dict[str, int],
+        out_combs: list[Dict[str, int]],
     ):
         if index_1:
             idx1, index_1 = index_1[0], index_1[1:]
             dim1, shape_1 = shape_1[0], shape_1[1:]
             if idx1 in index_kv:
-                calc_combinations(shape_1, shape_2, index_1, index_2, index_kv, out_combs)
+                calc_combinations(
+                    shape_1, shape_2, index_1, index_2, index_kv, out_combs
+                )
                 return
             else:
                 for i in range(dim1):
                     index_kv_ = index_kv.copy()
                     index_kv_[idx1] = i
-                    calc_combinations(shape_1, shape_2, index_1, index_2, index_kv_, out_combs)
+                    calc_combinations(
+                        shape_1, shape_2, index_1, index_2, index_kv_, out_combs
+                    )
                 return
 
         if index_2:
             idx2, index_2 = index_2[0], index_2[1:]
             dim2, shape_2 = shape_2[0], shape_2[1:]
             if idx2 in index_kv:
-                calc_combinations(shape_1, shape_2, index_1, index_2, index_kv, out_combs)
+                calc_combinations(
+                    shape_1, shape_2, index_1, index_2, index_kv, out_combs
+                )
                 return
             else:
                 for i in range(dim2):
                     index_kv_ = index_kv.copy()
                     index_kv_[idx2] = i
-                    calc_combinations(shape_1, shape_2, index_1, index_2, index_kv_, out_combs)
+                    calc_combinations(
+                        shape_1, shape_2, index_1, index_2, index_kv_, out_combs
+                    )
                 return
 
         out_combs.append(index_kv)
 
-    def get_value(target: list[Numbers], index: list[Numbers], index_kv: Dict[str, int]):
+    def get_value(
+        target: list[Numbers], index: list[Numbers], index_kv: Dict[str, int]
+    ):
         if isinstance(target, list):
             idx, index = index[0], index[1:]
             target = target[index_kv[idx]]
