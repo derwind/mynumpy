@@ -374,9 +374,12 @@ class ndarray:
 
     def conj(self) -> ndarray:
         if self.dtype != complex:
-            return ndarray(self.shape, self.dtype, copy.deepcopy(self.data))
+            return self.copy()
 
         return self._replace_elements(lambda x: x.real - x.imag * 1j)
+
+    def copy(self) -> ndarray:
+        return ndarray(self.shape, self.dtype, copy.deepcopy(self.data))
 
     @classmethod
     def _flatten(
