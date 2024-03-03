@@ -141,10 +141,33 @@ class ndarray:
 
         walk(self.data, indices, value)
 
+    def _replace_elements(self, func: Callable[[Numbers], Numbers]) -> ndarray:
+        data = copy.deepcopy(self.data)
+        if is_number(data):
+            return ndarray(self.shape, self.dtype, func(data))
+
+        def walk(data, func):
+            if is_number(data[0]):
+                for i, d in enumerate(data):
+                    data[i] = func(d)
+                return
+
+            for subdata in data:
+                walk(subdata, func)
+
+        walk(data, func)
+        return ndarray(self.shape, self.dtype, data)
+
     def _prepare_binary_operations(
         self, other: Numbers | ndarray
     ) -> tuple[list[int], list[int], list[int]]:
-        """Prepare for binary operations"""
+        """Prepare for binary operations
+
+        Returns:
+            list[int]: modified (e.g. broadcasted) self data for operations
+            list[int]: modified (e.g. broadcasted) other data for operations
+            list[int]: new_shape after binary operations
+        """
 
         new_shape = list(self.shape)
 
@@ -349,6 +372,12 @@ class ndarray:
         flat_data = [v.real for v in ndarray._flatten(self.data)]
         return ndarray(self.shape, float, flat_data)
 
+    def conj(self) -> ndarray:
+        if self.dtype != complex:
+            return ndarray(self.shape, self.dtype, copy.deepcopy(self.data))
+
+        return self._replace_elements(lambda x: x.real - x.imag * 1j)
+
     @classmethod
     def _flatten(
         cls, data: Numbers | list[Numbers], dtype: type | None = None
@@ -436,7 +465,7 @@ class ndarray:
         raise ValueError("can only convert an array of size 1 to a Python scalar")
 
 
-def calc_shape(a: Numbers | list[int], dims: list[int] | None = None) -> list[int]:
+def calc_shape(a: Numbers | list[int], dims: list[int] | None = None) -> tuple[int]:
     if dims is None:
         dims = []
     if is_number(a):
