@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import random
+from collections.abc import Callable
 from typing import Any, Dict
 
 from ..dtypes import Numbers
@@ -140,9 +141,11 @@ class ndarray:
 
         walk(self.data, indices, value)
 
-    def _prepare_operations(
+    def _prepare_binary_operations(
         self, other: Numbers | ndarray
     ) -> tuple[list[int], list[int], list[int]]:
+        """Prepare for binary operations"""
+
         new_shape = list(self.shape)
 
         if is_number(other):
@@ -171,32 +174,32 @@ class ndarray:
         return a, b, new_shape
 
     def __add__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x + y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __radd__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x + y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __sub__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x - y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rsub__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x - y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __mul__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x * y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rmul__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x * y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
@@ -259,22 +262,22 @@ class ndarray:
         return m
 
     def __truediv__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x / y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rtruediv__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x / y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __floordiv__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x // y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rfloordiv__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x // y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
