@@ -11,6 +11,47 @@ class TestNdArray(unittest.TestCase):
     def tearDown(self):
         ...
 
+    def test_matrix_rank(self):
+        a = mynp.array(
+            [
+                [1, 2],
+                [3, 4],
+            ]
+        )
+        self.assertEqual(mynp.linalg.matrix_rank(a), 2)
+
+        a = mynp.array(
+            [
+                [1, 2],
+                [2, 4],
+            ]
+        )
+        self.assertEqual(mynp.linalg.matrix_rank(a), 1)
+
+        a = mynp.array(
+            [
+                [0, 0],
+                [0, 0],
+            ]
+        )
+        self.assertEqual(mynp.linalg.matrix_rank(a), 0)
+
+        a = mynp.array(
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+            ]
+        )
+        self.assertEqual(mynp.linalg.matrix_rank(a), 0)
+
+        a = mynp.array(
+            [
+                [1, 2, -3],
+                [-4, 5, -6],
+            ]
+        )
+        self.assertEqual(mynp.linalg.matrix_rank(a), 2)
+
     def test_real_svd(self):
         random.seed(1234)
         for _ in range(10):
