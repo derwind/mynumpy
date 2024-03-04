@@ -3,6 +3,16 @@ from __future__ import annotations
 from ..core import ndarray, zeros
 
 
+def eye(N: int, M: int | None = None, dtype=float) -> ndarray:
+    if M is None:
+        M = N
+    arr = zeros((N, M), dtype=dtype)
+    one = dtype(1)
+    for i in range(min(N, M)):
+        arr.data[i][i] = one
+    return arr
+
+
 def diag(v: ndarray):
     """
     Extract a diagonal or construct a diagonal array.
