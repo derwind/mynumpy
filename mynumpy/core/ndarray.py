@@ -142,14 +142,15 @@ class ndarray:
 
         walk(self.data, indices, value)
 
-    def astype(self, dtype: type) -> ndarray:
+    def astype(self, dtype: type, suppress_warning: bool = False) -> ndarray:
         if self.dtype != complex:
             return self._replace_elements(lambda v: dtype(v))
         else:
-            print(
-                "ComplexWarning: Casting complex values to real discards the imaginary part",
-                file=sys.stderr,
-            )
+            if not suppress_warning:
+                print(
+                    "ComplexWarning: Casting complex values to real discards the imaginary part",
+                    file=sys.stderr,
+                )
             return self._replace_elements(lambda v: dtype(v.real))
 
     def _replace_elements(self, func: Callable[[Numbers], Numbers]) -> ndarray:
