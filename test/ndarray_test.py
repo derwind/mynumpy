@@ -1,5 +1,7 @@
 import unittest
+
 import mynumpy as mynp
+
 
 class TestNdArray(unittest.TestCase):
     def setUp(self):
