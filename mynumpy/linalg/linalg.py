@@ -32,7 +32,7 @@ def svd(G: ndarray, *args) -> tuple[ndarray, ndarray, ndarray]:
         need_reverse = True
 
     if G.dtype != float:
-        U = G.astype(float, suppress_warning=True)
+        U = G.real
     else:
         U = G.copy()
 
@@ -101,7 +101,7 @@ def svd(G: ndarray, *args) -> tuple[ndarray, ndarray, ndarray]:
     order = [orig_S.index(v) for v in S]
     if is_complex:
         U = U.astype(complex)
-        V = U.astype(complex)
+        V = V.astype(complex)
         S = array(S, dtype=complex)
     else:
         S = array(S, dtype=float)
