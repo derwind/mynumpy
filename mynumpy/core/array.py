@@ -4,7 +4,7 @@ import copy as copy_
 from typing import List
 
 from ..dtypes import Numbers
-from .ndarray import calc_shape, ndarray, _guess_dtype
+from .ndarray import _guess_dtype, calc_shape, ndarray
 
 
 def array(data: List[Numbers], dtype=None, *, copy: bool = True) -> ndarray:
