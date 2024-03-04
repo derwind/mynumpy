@@ -142,21 +142,26 @@ class ndarray:
 
         walk(self.data, indices, value)
 
-    def astype(self, dtype: type, suppress_warning: bool = False) -> ndarray:
+    def astype(self, dtype: type) -> ndarray:
         if self.dtype != complex:
-            return self._replace_elements(lambda v: dtype(v))
-        else:
-            if not suppress_warning:
-                print(
-                    "ComplexWarning: Casting complex values to real discards the imaginary part",
-                    file=sys.stderr,
-                )
-            return self._replace_elements(lambda v: dtype(v.real))
+            a = self._replace_elements(lambda v: dtype(v), dtype=dtype)
+            return a
 
-    def _replace_elements(self, func: Callable[[Numbers], Numbers]) -> ndarray:
+        print(
+            "ComplexWarning: Casting complex values to real discards the imaginary part",
+            file=sys.stderr,
+        )
+        a = self._replace_elements(lambda v: dtype(v.real), dtype=dtype)
+        return a
+
+    def _replace_elements(
+        self, func: Callable[[Numbers], Numbers], dtype: type | None = None
+    ) -> ndarray:
+        if dtype is None:
+            dtype = self.dtype
         data = copy.deepcopy(self.data)
         if is_number(data):
-            return ndarray(self.shape, self.dtype, func(data))
+            return ndarray(self.shape, dtype, func(data))
 
         def walk(data, func):
             if is_number(data[0]):
@@ -168,7 +173,7 @@ class ndarray:
                 walk(subdata, func)
 
         walk(data, func)
-        return ndarray(self.shape, self.dtype, data)
+        return ndarray(self.shape, dtype, data)
 
     def _prepare_binary_operations(
         self, other: Numbers | ndarray
@@ -381,8 +386,7 @@ class ndarray:
         typ = _guess_dtype(self.data)
         if typ == int or typ == float:
             return self
-        flat_data = [v.real for v in ndarray._flatten(self.data)]
-        return ndarray(self.shape, float, flat_data)
+        return self._replace_elements(lambda x: x.real, dtype=float)
 
     def _is_true_complex(self) -> bool:
         if self.dtype != complex:
