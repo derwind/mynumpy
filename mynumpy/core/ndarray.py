@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import random
+import sys
 from collections.abc import Callable
 from typing import Any, Dict
 
@@ -140,6 +141,16 @@ class ndarray:
                 walk(data[idx], indices[1:], inputs)
 
         walk(self.data, indices, value)
+
+    def astype(self, dtype: type) -> ndarray:
+        if self.dtype != complex:
+            return self._replace_elements(lambda v: dtype(v))
+        else:
+            print(
+                "ComplexWarning: Casting complex values to real discards the imaginary part",
+                file=sys.stderr,
+            )
+            return self._replace_elements(lambda v: dtype(v.real))
 
     def _replace_elements(self, func: Callable[[Numbers], Numbers]) -> ndarray:
         data = copy.deepcopy(self.data)
@@ -371,6 +382,23 @@ class ndarray:
             return self
         flat_data = [v.real for v in ndarray._flatten(self.data)]
         return ndarray(self.shape, float, flat_data)
+
+    def _is_true_complex(self) -> bool:
+        if self.dtype != complex:
+            return False
+
+        def walk(data):
+            if is_number(data):
+                return data.imag != 0
+
+            for subdata in data:
+                is_complex = walk(subdata)
+                if is_complex:
+                    return True
+
+            return False
+
+        return walk(self.data)
 
     def conj(self) -> ndarray:
         if self.dtype != complex:
