@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ..core import ndarray, zeros
 
+
 def diag(v: ndarray):
     """
     Extract a diagonal or construct a diagonal array.
