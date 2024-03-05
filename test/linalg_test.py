@@ -57,7 +57,7 @@ class TestNdArray(unittest.TestCase):
         for _ in range(10):
             m = random.choice(list(range(1, 10)))
             n = random.choice(list(range(1, 10)))
-            data = [random.random() * 10 for _ in range(m * n)]
+            data = [(random.random() - 0.5) * 20 for _ in range(m * n)]
             a = mynp.array(data, dtype=float).reshape(m, n)
             U, S, Vh = mynp.linalg.svd(a)
             self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
@@ -67,7 +67,7 @@ class TestNdArray(unittest.TestCase):
         for _ in range(10):
             m = random.choice(list(range(1, 10)))
             n = random.choice(list(range(1, 10)))
-            data = [random.random() * 10 for _ in range(m * n)]
+            data = [(random.random() - 0.5) * 20 for _ in range(m * n)]
             a = mynp.array(data, dtype=complex).reshape(m, n)
             a_real = a.real
             U, S, Vh = mynp.linalg.svd(a)
