@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import copy
 import random
+import sys
+from collections.abc import Callable
 from typing import Any, Dict
 
 from ..dtypes import Numbers
@@ -140,9 +142,50 @@ class ndarray:
 
         walk(self.data, indices, value)
 
-    def _prepare_operations(
+    def astype(self, dtype: type) -> ndarray:
+        if self.dtype != complex:
+            a = self._replace_elements(lambda v: dtype(v), dtype=dtype)
+            return a
+
+        print(
+            "ComplexWarning: Casting complex values to real discards the imaginary part",
+            file=sys.stderr,
+        )
+        a = self._replace_elements(lambda v: dtype(v.real), dtype=dtype)
+        return a
+
+    def _replace_elements(
+        self, func: Callable[[Numbers], Numbers], dtype: type | None = None
+    ) -> ndarray:
+        if dtype is None:
+            dtype = self.dtype
+        data = copy.deepcopy(self.data)
+        if is_number(data):
+            return ndarray(self.shape, dtype, func(data))
+
+        def walk(data, func):
+            if is_number(data[0]):
+                for i, d in enumerate(data):
+                    data[i] = func(d)
+                return
+
+            for subdata in data:
+                walk(subdata, func)
+
+        walk(data, func)
+        return ndarray(self.shape, dtype, data)
+
+    def _prepare_binary_operations(
         self, other: Numbers | ndarray
     ) -> tuple[list[int], list[int], list[int]]:
+        """Prepare for binary operations
+
+        Returns:
+            list[int]: modified (e.g. broadcasted) self data for operations
+            list[int]: modified (e.g. broadcasted) other data for operations
+            list[int]: new_shape after binary operations
+        """
+
         new_shape = list(self.shape)
 
         if is_number(other):
@@ -171,32 +214,32 @@ class ndarray:
         return a, b, new_shape
 
     def __add__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x + y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __radd__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x + y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __sub__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x - y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rsub__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x - y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __mul__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x * y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rmul__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x * y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
@@ -259,22 +302,22 @@ class ndarray:
         return m
 
     def __truediv__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x / y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rtruediv__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x / y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __floordiv__(self, other: Numbers | ndarray) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x // y for x, y in zip(a, b)]
         return ndarray(new_shape, type(data[0]), data)
 
     def __rfloordiv__(self, other: Numbers) -> ndarray:
-        a, b, new_shape = self._prepare_operations(other)
+        a, b, new_shape = self._prepare_binary_operations(other)
         data = [x // y for x, y in zip(b, a)]
         return ndarray(new_shape, type(data[0]), data)
 
@@ -343,8 +386,36 @@ class ndarray:
         typ = _guess_dtype(self.data)
         if typ == int or typ == float:
             return self
-        flat_data = [v.real for v in ndarray._flatten(self.data)]
-        return ndarray(self.shape, float, flat_data)
+        return self._replace_elements(lambda x: x.real, dtype=float)
+
+    def _is_true_complex(self) -> bool:
+        if self.dtype != complex:
+            return False
+
+        def walk(data):
+            if is_number(data):
+                return data.imag != 0
+
+            for subdata in data:
+                is_complex = walk(subdata)
+                if is_complex:
+                    return True
+
+            return False
+
+        return walk(self.data)
+
+    def conj(self) -> ndarray:
+        if self.dtype != complex:
+            return self.copy()
+
+        return self._replace_elements(lambda x: x.real - x.imag * 1j)
+
+    def copy(self) -> ndarray:
+        return ndarray(self.shape, self.dtype, copy.deepcopy(self.data))
+
+    def tolist(self) -> list[Numbers]:
+        return copy.deepcopy(self.data)
 
     @classmethod
     def _flatten(
@@ -433,7 +504,7 @@ class ndarray:
         raise ValueError("can only convert an array of size 1 to a Python scalar")
 
 
-def calc_shape(a: Numbers | list[int], dims: list[int] | None = None) -> list[int]:
+def calc_shape(a: Numbers | list[int], dims: list[int] | None = None) -> tuple[int]:
     if dims is None:
         dims = []
     if is_number(a):

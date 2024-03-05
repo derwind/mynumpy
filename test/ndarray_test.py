@@ -1,5 +1,7 @@
 import unittest
+
 import mynumpy as mynp
+
 
 class TestNdArray(unittest.TestCase):
     def setUp(self):
@@ -2270,3 +2272,46 @@ class TestNdArray(unittest.TestCase):
                 [1, 1],
                 [1, 1]
             ]
+
+    def test_conj(self):
+        a = mynp.array(5).conj()
+
+        self.assertEqual(a.data, 5)
+
+        a = mynp.array(5.3).conj()
+
+        self.assertEqual(a.data, 5.3)
+
+        a = mynp.array(5 + 3*1j).conj()
+
+        self.assertEqual(a.data, 5 - 3*1j)
+
+        a = mynp.array([
+            [1, 2, 3],
+            [4, 5, 6],
+        ]).conj()
+
+        self.assertEqual(a.data, [
+            [1, 2, 3],
+            [4, 5, 6],
+        ])
+
+        a = mynp.array([
+            [-1.2, 2.3, -3.4],
+            [4.5, -5.6, 6.7],
+        ]).conj()
+
+        self.assertEqual(a.data, [
+            [-1.2, 2.3, -3.4],
+            [4.5, -5.6, 6.7],
+        ])
+
+        a = mynp.array([
+            [-1.2 + 5.6*1j, 2.3 - 4.5*1j, -3.4 + 1.2*1j],
+            [4.5 - 6.7*1j, -5.6 - 2.3*1j, 6.7 + 3.4*1j],
+        ]).conj()
+
+        self.assertEqual(a.data, [
+            [-1.2 - 5.6*1j, 2.3 + 4.5*1j, -3.4 - 1.2*1j],
+            [4.5 + 6.7*1j, -5.6 + 2.3*1j, 6.7 - 3.4*1j],
+        ])

@@ -2,6 +2,27 @@ from __future__ import annotations
 
 from ..core import ndarray, zeros
 
+
+def eye(N: int, M: int | None = None, dtype=float) -> ndarray:
+    """Return a 2-D array with ones on the diagonal and zeros elsewhere.
+
+    Args:
+        N (int): Number of rows in the output.
+        M (int, optional): Number of columns in the output. Defaults to None.
+        dtype (type, optional): Data-type of the returned array. Defaults to float.
+
+    Returns:
+        ndarray: An array where all elements are equal to zero, except for the k-th diagonal, whose values are equal to one.
+    """
+    if M is None:
+        M = N
+    arr = zeros((N, M), dtype=dtype)
+    one = dtype(1)
+    for i in range(min(N, M)):
+        arr.data[i][i] = one
+    return arr
+
+
 def diag(v: ndarray):
     """
     Extract a diagonal or construct a diagonal array.
