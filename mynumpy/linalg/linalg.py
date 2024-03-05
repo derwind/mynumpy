@@ -5,6 +5,16 @@ from ..core.ndarray import is_number
 
 
 def norm(x: list | ndarray, ord: int | None = None) -> float:
+    """Matrix or vector norm.
+
+    Args:
+        x (ndarray): The input array.
+        ord (int, optional): The order of the norm. Defaults to None.
+
+    Returns:
+        float: The norm of the input array.
+    """
+
     if isinstance(x, ndarray):
         x = x.data
 
@@ -29,6 +39,16 @@ def norm(x: list | ndarray, ord: int | None = None) -> float:
 
 
 def matrix_rank(G: list | ndarray, tol: float | None = None) -> int:
+    """Return the matrix rank of a 2-dimensional array.
+
+    Args:
+        G (ndarray): The input matrix. Must be 2-dimensional.
+        tol (float, optional): The tolerance for singular values. Defaults to 1e-8.
+
+    Returns:
+        int: The matrix rank.
+    """
+
     if tol is None:
         tol = 1e-8
 
