@@ -1,6 +1,31 @@
 from __future__ import annotations
 
 from .. import array, eye, ndarray, sqrt
+from ..core.ndarray import is_number
+
+
+def norm(x: list | ndarray, ord: int | None = None) -> float:
+    if isinstance(x, ndarray):
+        x = x.data
+
+    if ord is None:
+        ord = 2
+    elif ord <= 0 or ord > 2:
+        raise ValueError("only ord=1 and ord=2 are supported")
+
+    def walk(data, total):
+        if is_number(data):
+            total[0] += abs(data) if ord == 1 else abs(data) ** ord
+            return
+
+        for subdata in data:
+            walk(subdata, total)
+
+        return
+
+    total = [0]
+    walk(x, total)
+    return total[0] if ord == 1 else sqrt(total[0])
 
 
 def matrix_rank(G: list | ndarray, tol: float | None = None) -> int:

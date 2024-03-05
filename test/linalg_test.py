@@ -1,3 +1,4 @@
+import math
 import random
 import unittest
 
@@ -10,6 +11,29 @@ class TestNdArray(unittest.TestCase):
 
     def tearDown(self):
         ...
+
+    def test_norm(self):
+        a = mynp.array([1, 2])
+        self.assertAlmostEqual(mynp.linalg.norm(a), math.sqrt(5))
+        self.assertAlmostEqual(mynp.linalg.norm(a, ord=1), 3)
+
+        a = mynp.array(
+            [
+                [1, 2],
+                [3, 4],
+            ]
+        )
+        self.assertAlmostEqual(mynp.linalg.norm(a), math.sqrt(30))
+        self.assertAlmostEqual(mynp.linalg.norm(a, ord=1), 10)
+
+        a = mynp.array(
+            [
+                [1 + 2j, -2 - 3j],
+                [-3 + 1j, 4 + 5j],
+            ]
+        )
+        self.assertAlmostEqual(mynp.linalg.norm(a), math.sqrt(69))
+        self.assertAlmostEqual(mynp.linalg.norm(a, ord=1), 15.407021150565008)
 
     def test_matrix_rank(self):
         a = mynp.array(
