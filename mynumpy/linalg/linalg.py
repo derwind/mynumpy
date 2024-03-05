@@ -94,6 +94,10 @@ def matrix_rank(G: list | ndarray, tol: float | None = None) -> int:
 def svd(G: list | ndarray, *args, **kwargs) -> tuple[ndarray, ndarray, ndarray]:
     """Singular Value Decomposition
 
+    References:
+    https://www.netlib.org/lapack/lawnspdf/lawn15.pdf  Algorithm 4.1
+    https://convexbrain.github.io/studynotes/SVD
+
     Args
         G (ndarray): The input matrix. Must be 2-dimensional.
 
