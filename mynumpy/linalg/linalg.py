@@ -74,11 +74,7 @@ def matrix_rank(G: list | ndarray, tol: float | None = None) -> int:
 
     _, n = U.shape
 
-    try:
-        _update_UV(U, tol=tol)
-    except OverflowError:
-        G.data[0][0] += tol  # W/A for non-invertible matrix
-        return matrix_rank(G, tol)
+    _update_UV(U, tol=tol)
 
     S = []
     for i in range(n):
@@ -138,24 +134,26 @@ def svd(G: list | ndarray, *args, **kwargs) -> tuple[ndarray, ndarray, ndarray]:
     S = []
     V = eye(n)
 
-    try:
-        _update_UV(U, V, tol)
-    except OverflowError:
-        G.data[0][0] += tol  # W/A for non-invertible matrix
-        return svd(G, *args, **kwargs)
+    _update_UV(U, V, tol)
 
     for i in range(n):
         u_i = U[:, i]
         sigma = sqrt(sum(u_i * u_i))
         S.append(sigma)
-        U[:, i] = U[:, i] / sigma
+        if sigma != 0:
+            U[:, i] = U[:, i] / sigma
 
     if need_reverse:
         U, V = V, U
 
     orig_S = S[:]
     S.sort(reverse=True)
-    order = [orig_S.index(v) for v in S]
+    order = []
+    for v in S:
+        idx = orig_S.index(v)
+        order.append(idx)
+        orig_S[idx] = None  # prevent duplicate for possible same singular values
+
     if is_complex:
         U = U.astype(complex)
         V = V.astype(complex)
@@ -186,9 +184,11 @@ def _update_UV(U: ndarray, V: ndarray | None = None, tol: float = 1e-8) -> None:
                 if c == 0:
                     continue
 
-                zeta = (b - a) / c
-                t = 1 / (abs(zeta) + sqrt(1 + zeta**2))
-                if zeta < 0:
+                # zeta = (b - a) / c
+                # t = 1 / (abs(zeta) + sqrt(1 + zeta**2))
+                t = abs(c) / (abs(b - a) + sqrt((b - a) ** 2 + c**2))
+                # if zeta < 0:
+                if (b - a) * c < 0:
                     t *= -1
                 cs = 1 / sqrt(1 + t**2)
                 sn = cs * t

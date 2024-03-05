@@ -76,6 +76,132 @@ class TestNdArray(unittest.TestCase):
         )
         self.assertEqual(mynp.linalg.matrix_rank(a), 2)
 
+    def test_svd(self):
+        # identity
+        data = [
+            [1, 0],
+            [0, 1],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1 / math.sqrt(2), 0],
+            [0, 1 / math.sqrt(2)],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, 2],
+            [0, 4],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        # non-regular, rank = 1
+        data = [
+            [1, 2],
+            [2, 4],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, 0],
+            [0, 0],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        # zero
+        data = [
+            [0, 0],
+            [0, 0],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, -2, 3],
+            [-4, 5, -6],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, -2],
+            [-3, 4],
+            [5, -6],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        # Jordan block
+        data = [
+            [3, 1, 0],
+            [0, 3, 1],
+            [0, 0, 3],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        # non-regular
+        data = [
+            [1, 1, -2],
+            [1, -2, 1],
+            [-2, 1, 1],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        data = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 0],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
+        # identity
+        data = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+        ]
+        a = mynp.array(data, dtype=float)
+        U, S, Vh = mynp.linalg.svd(a)
+        self.assertTrue(mynp.allclose(U @ mynp.diag(S) @ Vh, a))
+
     def test_real_svd(self):
         random.seed(1234)
         for _ in range(10):
