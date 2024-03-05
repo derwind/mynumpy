@@ -414,6 +414,9 @@ class ndarray:
     def copy(self) -> ndarray:
         return ndarray(self.shape, self.dtype, copy.deepcopy(self.data))
 
+    def tolist(self) -> list[Numbers]:
+        return copy.deepcopy(self.data)
+
     @classmethod
     def _flatten(
         cls, data: Numbers | list[Numbers], dtype: type | None = None
