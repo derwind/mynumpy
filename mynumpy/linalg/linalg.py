@@ -3,9 +3,12 @@ from __future__ import annotations
 from .. import array, eye, ndarray, sqrt
 
 
-def matrix_rank(G: ndarray, tol: float | None = None) -> int:
+def matrix_rank(G: list | ndarray, tol: float | None = None) -> int:
     if tol is None:
         tol = 1e-8
+
+    if isinstance(G, list):
+        G = array(G)
 
     if len(G.shape) != 2:
         raise ValueError("expected 2-dimensional array")
@@ -43,7 +46,7 @@ def matrix_rank(G: ndarray, tol: float | None = None) -> int:
     return len(S)
 
 
-def svd(G: ndarray, *args) -> tuple[ndarray, ndarray, ndarray]:
+def svd(G: list | ndarray, *args, **kwargs) -> tuple[ndarray, ndarray, ndarray]:
     """Singular Value Decomposition
 
     Args
@@ -56,6 +59,9 @@ def svd(G: ndarray, *args) -> tuple[ndarray, ndarray, ndarray]:
     """
 
     tol = 1e-8
+
+    if isinstance(G, list):
+        G = array(G)
 
     if len(G.shape) != 2:
         raise ValueError("expected 2-dimensional array")
@@ -87,7 +93,7 @@ def svd(G: ndarray, *args) -> tuple[ndarray, ndarray, ndarray]:
         _update_UV(U, V, tol)
     except OverflowError:
         G.data[0][0] += tol  # W/A for non-invertible matrix
-        return svd(G, *args)
+        return svd(G, *args, **kwargs)
 
     for i in range(n):
         u_i = U[:, i]
