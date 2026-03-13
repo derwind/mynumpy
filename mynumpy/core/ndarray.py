@@ -4,6 +4,7 @@ import copy
 import random
 import sys
 from collections.abc import Callable
+from contextlib import contextmanager
 from typing import Any, Dict
 
 from ..dtypes import Numbers
@@ -666,6 +667,29 @@ def broadcast(a: ndarray, shape: list[int] | tuple[int]) -> ndarray:
     return a
 
 
+_default_einsum_prod = lambda x, y: x * y
+_einsum_prod = _default_einsum_prod
+
+
+def set_einsum_product(prod: Callable[[Numbers, Numbers], Numbers] | None =None):
+    global _einsum_prod
+    if prod is None:
+        _einsum_prod = _default_einsum_prod
+    else:
+        _einsum_prod = prod
+
+
+@contextmanager
+def einsum_product(product=None):
+    global _einsum_prod
+    old = _einsum_prod
+    _einsum_prod = product if product is not None else _default_einsum_prod
+    try:
+        yield
+    finally:
+        _einsum_prod = old
+
+
 def _einsum2(subscripts: str, *operands: list[ndarray]) -> ndarray:
     subscripts = subscripts.replace(" ", "")
 
@@ -774,7 +798,7 @@ def _einsum2(subscripts: str, *operands: list[ndarray]) -> ndarray:
         for idx_kv in combinations_kv:
             v_1 = get_value(a_1.data, index_1, idx_kv)
             v_2 = get_value(a_2.data, index_2, idx_kv)
-            v += v_1 * v_2
+            v += _einsum_prod(v_1, v_2)
 
         return v
 
