@@ -1,6 +1,6 @@
 import unittest
 
-import mynumpy as mynp
+import mynumpy as xp
 
 
 class TestNdArray(unittest.TestCase):
@@ -11,43 +11,29 @@ class TestNdArray(unittest.TestCase):
         ...
 
     def test_create_ndarray(self):
-        a = mynp.ndarray(3)
-        self.assertEqual(len(a.data), 3)
+        a = xp.ndarray(3)
+        self.assertEqual(len(a.tolist()), 3)
 
-        a = mynp.ndarray((3,))
-        self.assertEqual(len(a.data), 3)
+        a = xp.ndarray((3,))
+        self.assertEqual(len(a.tolist()), 3)
 
     def test_create(self):
         data = 3
-        a = mynp.array(data)
-        self.assertEqual(data, a.data)
+        a = xp.array(data)
+        self.assertEqual(data, a.tolist())
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(data, a.data)
+        self.assertEqual(data, a.tolist())
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(data, a.data)
-
-        data = [
-            [
-                [1, -2],
-                [-3, 4]
-            ],
-            [
-                [-5, 6],
-                [7, -8]
-            ]
-        ]
-        a = mynp.array(data)
-
-        self.assertEqual(data, a.data)
+        self.assertEqual(data, a.tolist())
 
         data = [
             [
@@ -59,11 +45,25 @@ class TestNdArray(unittest.TestCase):
                 [7, -8]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(data, a.data)
+        self.assertEqual(data, a.tolist())
 
-        a = mynp.array(data, dtype=float)
+        data = [
+            [
+                [1, -2],
+                [-3, 4]
+            ],
+            [
+                [-5, 6],
+                [7, -8]
+            ]
+        ]
+        a = xp.array(data)
+
+        self.assertEqual(data, a.tolist())
+
+        a = xp.array(data, dtype=float)
 
         answer = [
             [
@@ -76,9 +76,9 @@ class TestNdArray(unittest.TestCase):
             ]
         ]
 
-        self.assertEqual(answer, a.data)
+        self.assertEqual(answer, a.tolist())
 
-        a = mynp.array(data, dtype=complex)
+        a = xp.array(data, dtype=complex)
 
         answer = [
             [
@@ -91,29 +91,29 @@ class TestNdArray(unittest.TestCase):
             ]
         ]
 
-        self.assertEqual(answer, a.data)
+        self.assertEqual(answer, a.tolist())
 
     def test_eq(self):
         data = 3
-        a = mynp.array(data)
-        b = mynp.array(data)
+        a = xp.array(data)
+        b = xp.array(data)
         self.assertTrue(a == 3)
         self.assertTrue(a == b)
 
         data = [1, 2, 3]
-        a = mynp.array(data)
-        b = mynp.array(data)
+        a = xp.array(data)
+        b = xp.array(data)
 
-        self.assertTrue(a == b)
+        self.assertTrue(a.tolist() == b.tolist())
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
-        b = mynp.array(data)
+        a = xp.array(data)
+        b = xp.array(data)
 
-        self.assertTrue(a == b)
+        self.assertTrue(a.tolist() == b.tolist())
 
         data = [
             [
@@ -125,26 +125,26 @@ class TestNdArray(unittest.TestCase):
                 [7, -8]
             ]
         ]
-        a = mynp.array(data)
-        b = mynp.array(data)
+        a = xp.array(data)
+        b = xp.array(data)
 
-        self.assertTrue(a == b)
+        self.assertTrue(a.tolist() == b.tolist())
 
     def test_neq(self):
         data = 3
         data2 = 5
-        a = mynp.array(data)
-        b = mynp.array(data2)
-        self.assertTrue(a != 5)
-        self.assertTrue(a != b)
+        a = xp.array(data)
+        b = xp.array(data2)
+        self.assertTrue(a.tolist() != 5)
+        self.assertTrue(a.tolist() != b.tolist())
 
         data = [1, 2, 3]
         data2 = [4, 5, 6]
-        a = mynp.array(data)
-        b = mynp.array(data2)
+        a = xp.array(data)
+        b = xp.array(data2)
 
-        self.assertTrue(a != b)
-        self.assertTrue(a != 0)
+        self.assertTrue(a.tolist() != b.tolist())
+        self.assertTrue(a.tolist() != 0)
 
         data = [
             [1, 2],
@@ -154,11 +154,11 @@ class TestNdArray(unittest.TestCase):
             [-1, -2],
             [-3, -4]
         ]
-        a = mynp.array(data)
-        b = mynp.array(data2)
+        a = xp.array(data)
+        b = xp.array(data2)
 
-        self.assertTrue(a != b)
-        self.assertTrue(a != 0)
+        self.assertTrue(a.tolist() != b.tolist())
+        self.assertTrue(a.tolist() != 0)
 
         data = [
             [
@@ -180,20 +180,20 @@ class TestNdArray(unittest.TestCase):
                 [-7, 8]
             ]
         ]
-        a = mynp.array(data)
-        b = mynp.array(data2)
+        a = xp.array(data)
+        b = xp.array(data2)
 
-        self.assertTrue(a != b)
-        self.assertTrue(a != 0)
+        self.assertTrue(a.tolist() != b.tolist())
+        self.assertTrue(a.tolist() != 0)
 
     def test_ndim(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.ndim, 0)
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.ndim, 1)
 
@@ -201,7 +201,7 @@ class TestNdArray(unittest.TestCase):
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.ndim, 2)
 
@@ -215,18 +215,18 @@ class TestNdArray(unittest.TestCase):
                 [7, -8]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.ndim, 3)
 
     def test_shape(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.shape, ())
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.shape, (3,))
 
@@ -234,7 +234,7 @@ class TestNdArray(unittest.TestCase):
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.shape, (2, 2))
 
@@ -256,19 +256,19 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.shape, (4, 2, 3))
 
     def test_len(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
         with self.assertRaises(TypeError):
             self.assertEqual(len(a), 0)
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(len(a), 3)
 
@@ -276,7 +276,7 @@ class TestNdArray(unittest.TestCase):
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(len(a), 2)
 
@@ -298,18 +298,18 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(len(a), 4)
 
     def test_size(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.size, 1)
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.size, 3)
 
@@ -317,7 +317,7 @@ class TestNdArray(unittest.TestCase):
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.size, 4)
 
@@ -339,28 +339,28 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.size, 24)
 
     def test_flatten(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.flatten().data, [3])
+        self.assertEqual(a.flatten().tolist(), [3])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.flatten().data, [1, 2, 3])
+        self.assertEqual(a.flatten().tolist(), [1, 2, 3])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.flatten().data, [1, 2, 3, 4])
+        self.assertEqual(a.flatten().tolist(), [1, 2, 3, 4])
 
         data = [
             [
@@ -380,32 +380,32 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.flatten().data, [1, -2, 3, -4, 5, -6, -7, 8, -9, 10, -11, 12, -1, 2, -3, 4, -5, 6, 7, -8, 9, -10, 11, -12])
+        self.assertEqual(a.flatten().tolist(), [1, -2, 3, -4, 5, -6, -7, 8, -9, 10, -11, 12, -1, 2, -3, 4, -5, 6, 7, -8, 9, -10, 11, -12])
 
     def test_reshape(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape(1).data, [3])
-        self.assertEqual(a.reshape(1, 1).data, [[3]])
-        self.assertEqual(a.reshape(1, 1, 1).data, [[[3]]])
+        self.assertEqual(a.reshape(1).tolist(), [3])
+        self.assertEqual(a.reshape(1, 1).tolist(), [[3]])
+        self.assertEqual(a.reshape(1, 1, 1).tolist(), [[[3]]])
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape(1).data, [3])
-        self.assertEqual(a.reshape(1, 1).data, [[3]])
-        self.assertEqual(a.reshape(1, 1, 1).data, [[[3]]])
+        self.assertEqual(a.reshape(1).tolist(), [3])
+        self.assertEqual(a.reshape(1, 1).tolist(), [[3]])
+        self.assertEqual(a.reshape(1, 1, 1).tolist(), [[[3]]])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape((3, 1)).data, [[1], [2], [3]])
-        self.assertEqual(a.reshape(3, 1).data, [[1], [2], [3]])
-        self.assertEqual(a.reshape((-1, 1)).data, [[1], [2], [3]])
-        self.assertEqual(a.reshape(-1, 1).data, [[1], [2], [3]])
+        self.assertEqual(a.reshape((3, 1)).tolist(), [[1], [2], [3]])
+        self.assertEqual(a.reshape(3, 1).tolist(), [[1], [2], [3]])
+        self.assertEqual(a.reshape((-1, 1)).tolist(), [[1], [2], [3]])
+        self.assertEqual(a.reshape(-1, 1).tolist(), [[1], [2], [3]])
 
         with self.assertRaises(ValueError):
             a.reshape((-1, 5))
@@ -416,16 +416,16 @@ class TestNdArray(unittest.TestCase):
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape((1, 4)).data, [[1, 2, 3, 4]])
-        self.assertEqual(a.reshape(1, 4).data, [[1, 2, 3, 4]])
-        self.assertEqual(a.reshape((-1, 4)).data, [[1, 2, 3, 4]])
-        self.assertEqual(a.reshape(-1, 4).data, [[1, 2, 3, 4]])
-        self.assertEqual(a.reshape((4, 1)).data, [[1], [2], [3], [4]])
-        self.assertEqual(a.reshape(4, 1).data, [[1], [2], [3], [4]])
-        self.assertEqual(a.reshape((-1, 1)).data, [[1], [2], [3], [4]])
-        self.assertEqual(a.reshape(-1, 1).data, [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape((1, 4)).tolist(), [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape(1, 4).tolist(), [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape((-1, 4)).tolist(), [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape(-1, 4).tolist(), [[1, 2, 3, 4]])
+        self.assertEqual(a.reshape((4, 1)).tolist(), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape(4, 1).tolist(), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape((-1, 1)).tolist(), [[1], [2], [3], [4]])
+        self.assertEqual(a.reshape(-1, 1).tolist(), [[1], [2], [3], [4]])
 
         with self.assertRaises(ValueError):
             a.reshape((-1, 3))
@@ -436,9 +436,9 @@ class TestNdArray(unittest.TestCase):
             [1, 2, 3],
             [4, 5, 6]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape((2, 1, 3)).data, [
+        self.assertEqual(a.reshape((2, 1, 3)).tolist(), [
             [
                 [1, 2, 3]
             ],
@@ -465,9 +465,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.reshape((2, 3, 4)).data, [
+        self.assertEqual(a.reshape((2, 3, 4)).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
             ],
@@ -475,7 +475,7 @@ class TestNdArray(unittest.TestCase):
                 [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(2, 3, 4).data, [
+        self.assertEqual(a.reshape(2, 3, 4).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
             ],
@@ -483,7 +483,7 @@ class TestNdArray(unittest.TestCase):
                 [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape((-1, 3, 4)).data, [
+        self.assertEqual(a.reshape((-1, 3, 4)).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
             ],
@@ -491,7 +491,7 @@ class TestNdArray(unittest.TestCase):
                 [-1, 2, -3, 4], [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(-1, 3, 4).data, [
+        self.assertEqual(a.reshape(-1, 3, 4).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8], [-9, 10, -11, 12]
             ],
@@ -500,7 +500,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual(a.reshape((4, 3, 2)).data, [
+        self.assertEqual(a.reshape((4, 3, 2)).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6]
             ],
@@ -514,7 +514,7 @@ class TestNdArray(unittest.TestCase):
                 [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(4, 3, 2).data, [
+        self.assertEqual(a.reshape(4, 3, 2).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6]
             ],
@@ -528,7 +528,7 @@ class TestNdArray(unittest.TestCase):
                 [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape((-1, 3, 2)).data, [
+        self.assertEqual(a.reshape((-1, 3, 2)).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6]
             ],
@@ -542,7 +542,7 @@ class TestNdArray(unittest.TestCase):
                 [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(-1, 3, 2).data, [
+        self.assertEqual(a.reshape(-1, 3, 2).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6]
             ],
@@ -557,7 +557,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual(a.reshape((3, 4, 2)).data, [
+        self.assertEqual(a.reshape((3, 4, 2)).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6], [-7, 8]
             ],
@@ -568,7 +568,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6], [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(3, 4, 2).data, [
+        self.assertEqual(a.reshape(3, 4, 2).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6], [-7, 8]
             ],
@@ -579,7 +579,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6], [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape((-1, 4, 2)).data, [
+        self.assertEqual(a.reshape((-1, 4, 2)).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6], [-7, 8]
             ],
@@ -590,7 +590,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6], [7, -8], [9, -10], [11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(-1, 4, 2).data, [
+        self.assertEqual(a.reshape(-1, 4, 2).tolist(), [
             [
                 [1, -2], [3, -4], [5, -6], [-7, 8]
             ],
@@ -602,7 +602,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual(a.reshape((3, 2, 4)).data, [
+        self.assertEqual(a.reshape((3, 2, 4)).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8]
             ],
@@ -613,7 +613,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(3, 2, 4).data, [
+        self.assertEqual(a.reshape(3, 2, 4).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8]
             ],
@@ -624,7 +624,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape((-1, 2, 4)).data, [
+        self.assertEqual(a.reshape((-1, 2, 4)).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8]
             ],
@@ -635,7 +635,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 6, 7, -8], [9, -10, 11, -12]
             ]
         ])
-        self.assertEqual(a.reshape(-1, 2, 4).data, [
+        self.assertEqual(a.reshape(-1, 2, 4).tolist(), [
             [
                 [1, -2, 3, -4], [5, -6, -7, 8]
             ],
@@ -654,32 +654,32 @@ class TestNdArray(unittest.TestCase):
 
     def test_T(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, 3)
+        self.assertEqual(a.T.tolist(), 3)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, [3])
+        self.assertEqual(a.T.tolist(), [3])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, [1, 2, 3])
+        self.assertEqual(a.T.tolist(), [1, 2, 3])
 
         data = [[1], [2], [3]]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, [[1, 2, 3]])
+        self.assertEqual(a.T.tolist(), [[1, 2, 3]])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, [
+        self.assertEqual(a.T.tolist(), [
             [1, 3],
             [2, 4]
         ])
@@ -702,9 +702,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual(a.T.data, [
+        self.assertEqual(a.T.tolist(), [
             [
                 [1, -7, -1, 7],
                 [-4, 10, 4, -10]
@@ -720,28 +720,28 @@ class TestNdArray(unittest.TestCase):
         ])
 
     def test_zeros(self):
-        a = mynp.zeros(3)
+        a = xp.zeros(3)
 
-        self.assertEqual(a.data, [0, 0, 0])
+        self.assertEqual(a.tolist(), [0, 0, 0])
 
-        a = mynp.zeros([3])
+        a = xp.zeros([3])
 
-        self.assertEqual(a.data, [0, 0, 0])
+        self.assertEqual(a.tolist(), [0, 0, 0])
 
-        a = mynp.zeros((3))
+        a = xp.zeros((3))
 
-        self.assertEqual(a.data, [0, 0, 0])
+        self.assertEqual(a.tolist(), [0, 0, 0])
 
-        a = mynp.zeros((2, 2))
+        a = xp.zeros((2, 2))
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [0, 0],
             [0, 0]
         ])
 
-        a = mynp.zeros((4, 2, 3))
+        a = xp.zeros((4, 2, 3))
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [
                 [0, 0, 0],
                 [0, 0, 0]
@@ -762,48 +762,48 @@ class TestNdArray(unittest.TestCase):
 
     def test_item(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.item(), 3)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.item(), 3)
 
         data = [[3]]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         self.assertEqual(a.item(), 3)
 
         with self.assertRaises(ValueError):
             data = [1, 2]
-            a = mynp.array(data)
+            a = xp.array(data)
             a.item()
 
     def test_zeros_like(self):
         data = 3
-        a = mynp.zeros_like(data)
+        a = xp.zeros_like(data)
 
-        self.assertEqual(a.data, 0)
+        self.assertEqual(a.tolist(), 0)
 
         data = [3]
-        a = mynp.zeros_like(data)
+        a = xp.zeros_like(data)
 
-        self.assertEqual(a.data, [0])
+        self.assertEqual(a.tolist(), [0])
 
         data = [1, 2, 3]
-        a = mynp.zeros_like(data)
+        a = xp.zeros_like(data)
 
-        self.assertEqual(a.data, [0, 0, 0])
+        self.assertEqual(a.tolist(), [0, 0, 0])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.zeros_like(data)
+        a = xp.zeros_like(data)
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [0, 0],
             [0, 0]
         ])
@@ -826,9 +826,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.zeros_like(data)
+        a = xp.zeros_like(data)
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [
                 [0, 0, 0],
                 [0, 0, 0]
@@ -848,28 +848,28 @@ class TestNdArray(unittest.TestCase):
         ])
 
     def test_ones(self):
-        a = mynp.ones(3)
+        a = xp.ones(3)
 
-        self.assertEqual(a.data, [1, 1, 1])
+        self.assertEqual(a.tolist(), [1, 1, 1])
 
-        a = mynp.ones([3])
+        a = xp.ones([3])
 
-        self.assertEqual(a.data, [1, 1, 1])
+        self.assertEqual(a.tolist(), [1, 1, 1])
 
-        a = mynp.ones((3))
+        a = xp.ones((3))
 
-        self.assertEqual(a.data, [1, 1, 1])
+        self.assertEqual(a.tolist(), [1, 1, 1])
 
-        a = mynp.ones((2, 2))
+        a = xp.ones((2, 2))
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [1, 1],
             [1, 1]
         ])
 
-        a = mynp.ones((4, 2, 3))
+        a = xp.ones((4, 2, 3))
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [
                 [1, 1, 1],
                 [1, 1, 1]
@@ -890,27 +890,27 @@ class TestNdArray(unittest.TestCase):
 
     def test_ones_like(self):
         data = 3
-        a = mynp.ones_like(data)
+        a = xp.ones_like(data)
 
-        self.assertEqual(a.data, 1)
+        self.assertEqual(a.tolist(), 1)
 
         data = [3]
-        a = mynp.ones_like(data)
+        a = xp.ones_like(data)
 
-        self.assertEqual(a.data, [1])
+        self.assertEqual(a.tolist(), [1])
 
         data = [1, 2, 3]
-        a = mynp.ones_like(data)
+        a = xp.ones_like(data)
 
-        self.assertEqual(a.data, [1, 1, 1])
+        self.assertEqual(a.tolist(), [1, 1, 1])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.ones_like(data)
+        a = xp.ones_like(data)
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [1, 1],
             [1, 1]
         ])
@@ -933,9 +933,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.ones_like(data)
+        a = xp.ones_like(data)
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [
                 [1, 1, 1],
                 [1, 1, 1]
@@ -956,32 +956,32 @@ class TestNdArray(unittest.TestCase):
 
     def test_add(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a + 5).data, 8)
+        self.assertEqual((a + 5).tolist(), 8)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a + 5).data, [8])
+        self.assertEqual((a + 5).tolist(), [8])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a + 5).data, [6, 7, 8])
+        self.assertEqual((a + 5).tolist(), [6, 7, 8])
 
         data2 = [-3, -2, -1]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a + b).data, [-2, 0, 2])
+        self.assertEqual((a + b).tolist(), [-2, 0, 2])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a + 5).data, [
+        self.assertEqual((a + 5).tolist(), [
             [6, 7],
             [8, 9]
         ])
@@ -990,9 +990,9 @@ class TestNdArray(unittest.TestCase):
             [1, 0],
             [0, 2]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a + b).data, [
+        self.assertEqual((a + b).tolist(), [
             [2, 2],
             [3, 6]
         ])
@@ -1015,9 +1015,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a + 5).data, [
+        self.assertEqual((a + 5).tolist(), [
             [
                 [6, 3, 8],
                 [1, 10, -1]
@@ -1054,9 +1054,9 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a + b).data, [
+        self.assertEqual((a + b).tolist(), [
             [
                 [2, 0, 6],
                 [0, 10, 0]
@@ -1075,12 +1075,12 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [1],
             [2]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [
                 [1, 2, 3]
             ],
@@ -1095,7 +1095,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual((a + b).data, [
+        self.assertEqual((a + b).tolist(), [
             [
                 [2, 3, 4],
                 [3, 4, 5]
@@ -1116,49 +1116,49 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a + b
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2, 3, 4, 5]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a + b
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([1, 2, 3])
+            b = xp.array([1, 2, 3])
             a + b
 
     def test_radd(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((5 + a).data, 8)
+        self.assertEqual((5 + a).tolist(), 8)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((5 + a).data, [8])
+        self.assertEqual((5 + a).tolist(), [8])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((5 + a).data, [6, 7, 8])
+        self.assertEqual((5 + a).tolist(), [6, 7, 8])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((5 + a).data, [
+        self.assertEqual((5 + a).tolist(), [
             [6, 7],
             [8, 9]
         ])
@@ -1181,9 +1181,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((5 + a).data, [
+        self.assertEqual((5 + a).tolist(), [
             [
                 [6, 3, 8],
                 [1, 10, -1]
@@ -1204,32 +1204,32 @@ class TestNdArray(unittest.TestCase):
 
     def test_sub(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a - 5).data, -2)
+        self.assertEqual((a - 5).tolist(), -2)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a - 5).data, [-2])
+        self.assertEqual((a - 5).tolist(), [-2])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a - 5).data, [-4, -3, -2])
+        self.assertEqual((a - 5).tolist(), [-4, -3, -2])
 
         data2 = [-3, -2, -1]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a - b).data, [4, 4, 4])
+        self.assertEqual((a - b).tolist(), [4, 4, 4])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a - 5).data, [
+        self.assertEqual((a - 5).tolist(), [
             [-4, -3],
             [-2, -1]
         ])
@@ -1238,9 +1238,9 @@ class TestNdArray(unittest.TestCase):
             [1, 0],
             [0, 2]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a - b).data, [
+        self.assertEqual((a - b).tolist(), [
             [0, 2],
             [3, 2]
         ])
@@ -1263,9 +1263,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a - 5).data, [
+        self.assertEqual((a - 5).tolist(), [
             [
                 [-4, -7, -2],
                 [-9, 0, -11]
@@ -1302,9 +1302,9 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a - b).data, [
+        self.assertEqual((a - b).tolist(), [
             [
                 [0, -4, 0],
                 [-8, 0, -12]
@@ -1323,12 +1323,12 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [1],
             [2]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [
                 [1, 2, 3]
             ],
@@ -1343,7 +1343,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual((a - b).data, [
+        self.assertEqual((a - b).tolist(), [
             [
                 [0, -1, -2],
                 [1, 0, -1]
@@ -1364,54 +1364,54 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a - b
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2, 3, 4, 5]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a - b
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([1, 2, 3])
+            b = xp.array([1, 2, 3])
             a + b
 
     def test_mul(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a * 5).data, 15)
+        self.assertEqual((a * 5).tolist(), 15)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a * 5).data, [15])
+        self.assertEqual((a * 5).tolist(), [15])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a * 5).data, [5, 10, 15])
+        self.assertEqual((a * 5).tolist(), [5, 10, 15])
 
         data2 = [-3, -2, -1]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a * b).data, [-3, -4, -3])
+        self.assertEqual((a * b).tolist(), [-3, -4, -3])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a * 5).data, [
+        self.assertEqual((a * 5).tolist(), [
             [5, 10],
             [15, 20]
         ])
@@ -1420,9 +1420,9 @@ class TestNdArray(unittest.TestCase):
             [1, 0],
             [0, 2]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a * b).data, [
+        self.assertEqual((a * b).tolist(), [
             [1, 0],
             [0, 8]
         ])
@@ -1445,9 +1445,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a * 5).data, [
+        self.assertEqual((a * 5).tolist(), [
             [
                 [5, -10, 15],
                 [-20, 25, -30]
@@ -1484,9 +1484,9 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a * b).data, [
+        self.assertEqual((a * b).tolist(), [
             [
                 [1, -4, 9],
                 [-16, 25, -36]
@@ -1505,12 +1505,12 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [1],
             [2]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [
                 [1, 2, 3]
             ],
@@ -1525,7 +1525,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual((a * b).data, [
+        self.assertEqual((a * b).tolist(), [
             [
                 [1, 2, 3],
                 [2, 4, 6]
@@ -1546,54 +1546,54 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a * b
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2, 3, 4, 5]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a * b
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([1, 2, 3])
+            b = xp.array([1, 2, 3])
             a * b
 
     def test_truediv(self):
         data = 3
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a / 5).data, 0.6)
+        self.assertEqual((a / 5).tolist(), 0.6)
 
         data = [3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a / 5).data, [0.6])
+        self.assertEqual((a / 5).tolist(), [0.6])
 
         data = [1, 2, 3]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a / 5).data, [0.2, 0.4, 0.6])
+        self.assertEqual((a / 5).tolist(), [0.2, 0.4, 0.6])
 
         data2 = [-3, -2, -1]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a / b).data, [-0.3333333333333333, -1.0, -3.0])
+        self.assertEqual((a / b).tolist(), [-0.3333333333333333, -1.0, -3.0])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a / 5).data, [
+        self.assertEqual((a / 5).tolist(), [
             [0.2, 0.4],
             [0.6, 0.8]
         ])
@@ -1602,9 +1602,9 @@ class TestNdArray(unittest.TestCase):
             [1, -1],
             [-1, 2]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a / b).data, [
+        self.assertEqual((a / b).tolist(), [
             [1.0, -2.0],
             [-3.0, 2.0]
         ])
@@ -1627,9 +1627,9 @@ class TestNdArray(unittest.TestCase):
                 [-10, 11, -12]
             ]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
-        self.assertEqual((a / 5).data, [
+        self.assertEqual((a / 5).tolist(), [
             [
                 [0.2, -0.4, 0.6],
                 [-0.8, 1.0, -1.2]
@@ -1666,9 +1666,9 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a / b).data, [
+        self.assertEqual((a / b).tolist(), [
             [
                 [1.0, -1.0, 1.0],
                 [-1.0, 1.0, -1.0]
@@ -1687,12 +1687,12 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [1],
             [2]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [
                 [1, 2, 3]
             ],
@@ -1707,7 +1707,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual((a / b).data, [
+        self.assertEqual((a / b).tolist(), [
             [
                 [1.0, 0.5, 0.3333333333333333],
                 [2.0, 1.0, 0.6666666666666666]
@@ -1728,65 +1728,65 @@ class TestNdArray(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a / b
 
         with self.assertRaises(ValueError):
             data = [1, 2, 3]
-            a = mynp.array(data)
+            a = xp.array(data)
             data2 = [1, 2, 3, 4, 5]
-            b = mynp.array(data2)
+            b = xp.array(data2)
             a / b
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([1, 2, 3])
+            b = xp.array([1, 2, 3])
             a / b
 
     def test_matmul(self):
         data = [1, 2]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         data2 = [
             [1, 2],
             [3, 4]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a @ b).data, [7, 10])
-        self.assertEqual((b @ a).data, [5, 11])
+        self.assertEqual((a @ b).tolist(), [7, 10])
+        self.assertEqual((b @ a).tolist(), [5, 11])
 
         data3 = [3, 4]
-        c = mynp.array(data3)
+        c = xp.array(data3)
 
-        self.assertEqual((a @ c).data, 11)
-        self.assertEqual((c @ a).data, 11)
+        self.assertEqual((a @ c).tolist(), 11)
+        self.assertEqual((c @ a).tolist(), 11)
 
         data4 = [[1], [2]]
-        d = mynp.array(data4)
+        d = xp.array(data4)
 
         with self.assertRaises(ValueError):
             d @ b
-        self.assertEqual((b @ d).data, [[5], [11]])
+        self.assertEqual((b @ d).tolist(), [[5], [11]])
 
         data = [
             [1, 2],
             [3, 4]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         data2 = [
             [-1, 0],
             [4, -5]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a @ b).data, [
+        self.assertEqual((a @ b).tolist(), [
             [7, -10],
             [13, -20]
         ])
@@ -1796,15 +1796,15 @@ class TestNdArray(unittest.TestCase):
             [3, 4],
             [5, 6]
         ]
-        a = mynp.array(data)
+        a = xp.array(data)
 
         data2 = [
             [-1, 0, 3, 1],
             [4, -5, -2, 3]
         ]
-        b = mynp.array(data2)
+        b = xp.array(data2)
 
-        self.assertEqual((a @ b).data, [
+        self.assertEqual((a @ b).tolist(), [
             [7, -10, -1, 7],
             [13, -20, 1, 15],
             [19, -30, 3, 23]
@@ -1814,28 +1814,28 @@ class TestNdArray(unittest.TestCase):
             b @ a
 
     def test_einsum(self):
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
 
-        self.assertEqual(mynp.einsum('ii->', a).data, 5)
+        self.assertEqual(xp.einsum('ii->', a).tolist(), 5)
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
 
-        self.assertEqual(mynp.einsum('ij->ij', a).data, [
+        self.assertEqual(xp.einsum('ij->ij', a).tolist(), [
             [1, 2],
             [3, 4]
         ])
-        self.assertEqual(mynp.einsum('ij->ji', a).data, [
+        self.assertEqual(xp.einsum('ij->ji', a).tolist(), [
             [1, 3],
             [2, 4]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2],
                 [3, 4]
@@ -1846,7 +1846,7 @@ class TestNdArray(unittest.TestCase):
             ],
         ])
 
-        self.assertEqual(mynp.einsum('ijk->jki', a).data, [
+        self.assertEqual(xp.einsum('ijk->jki', a).tolist(), [
             [
                 [1, 5],
                 [2, 6]
@@ -1858,76 +1858,76 @@ class TestNdArray(unittest.TestCase):
         ])
 
 
-        a = mynp.array([1, 2, 3])
-        b = mynp.array([-2, 1, 4])
+        a = xp.array([1, 2, 3])
+        b = xp.array([-2, 1, 4])
 
-        self.assertEqual(mynp.einsum('i,i->', a, b).data, 12)
+        self.assertEqual(xp.einsum('i,i->', a, b).tolist(), 12)
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
-        b = mynp.array([
+        b = xp.array([
             [-5, 6],
             [7, -8]
         ])
 
-        self.assertEqual(mynp.einsum('ij,ij->', a, b).data, -4)
-        self.assertEqual(mynp.einsum('ij,ji->', a, b).data, -5)
-        self.assertEqual(mynp.einsum('ij,ij->i', a, b).data, [7, -11])
-        self.assertEqual(mynp.einsum('ij,ij->j', a, b).data, [16, -20])
+        self.assertEqual(xp.einsum('ij,ij->', a, b).tolist(), -4)
+        self.assertEqual(xp.einsum('ij,ji->', a, b).tolist(), -5)
+        self.assertEqual(xp.einsum('ij,ij->i', a, b).tolist(), [7, -11])
+        self.assertEqual(xp.einsum('ij,ij->j', a, b).tolist(), [16, -20])
 
-        a = mynp.array([1, 2])
+        a = xp.array([1, 2])
 
-        b = mynp.array([
+        b = xp.array([
             [1, 2],
             [3, 4]
         ])
 
-        self.assertEqual(mynp.einsum('i,ij->j', a, b).data, [7, 10])
-        self.assertEqual(mynp.einsum('i,ji->j', a, b).data, [5, 11])
+        self.assertEqual(xp.einsum('i,ij->j', a, b).tolist(), [7, 10])
+        self.assertEqual(xp.einsum('i,ji->j', a, b).tolist(), [5, 11])
 
-        self.assertEqual(mynp.einsum('ij,i->j', b, a).data, [7, 10])
-        self.assertEqual(mynp.einsum('ij,j->i', b, a).data, [5, 11])
+        self.assertEqual(xp.einsum('ij,i->j', b, a).tolist(), [7, 10])
+        self.assertEqual(xp.einsum('ij,j->i', b, a).tolist(), [5, 11])
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [-2, 1],
             [-5, 3]
         ])
 
-        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+        self.assertEqual(xp.einsum('ij,jk->ik', a, b).tolist(), [
             [-12, 7],
             [-26, 15]
         ])
 
-        self.assertEqual(mynp.einsum('jk,ki->ji', a, b).data, [
+        self.assertEqual(xp.einsum('jk,ki->ji', a, b).tolist(), [
             [-12, 7],
             [-26, 15]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4],
             [5, 6]
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [7, 8, 9, 10],
             [11, 12, 13, 14]
         ])
 
-        self.assertEqual(mynp.einsum('ij,jk->ik', a, b).data, [
+        self.assertEqual(xp.einsum('ij,jk->ik', a, b).tolist(), [
             [ 29, 32, 35, 38],
             [ 65, 72, 79, 86],
             [101, 112, 123, 134]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2],
                 [3, 4]
@@ -1938,7 +1938,7 @@ class TestNdArray(unittest.TestCase):
             ],
         ])
 
-        b = mynp.array([
+        b = xp.array([
             [
                 [-1, -5],
                 [-3, 2],
@@ -1951,64 +1951,64 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        self.assertEqual(mynp.einsum('ijk,ilj->jl', a, b).data, [
+        self.assertEqual(xp.einsum('ijk,ilj->jl', a, b).tolist(), [
             [30, -42, -41],
             [55, 44, 43]
         ])
 
-        with self.assertRaises(IndexError):
-            a = mynp.array([
+        with self.assertRaises((IndexError, ValueError)):
+            a = xp.array([
                 [1, 2],
                 [3, 4],
                 [5, 6]
             ])
-            mynp.einsum('ii->', a)
+            xp.einsum('ii->', a)
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([
+            b = xp.array([
                 [-2, 1],
                 [-5, 3]
             ])
-            mynp.einsum('ijl,jk->ik', a, b)
+            xp.einsum('ijl,jk->ik', a, b)
 
         with self.assertRaises(ValueError):
-            a = mynp.array([
+            a = xp.array([
                 [1, 2],
                 [3, 4]
             ])
-            b = mynp.array([
+            b = xp.array([
                 [-2, 1],
                 [-5, 3]
             ])
-            mynp.einsum('i,jk->ik', a, b)
+            xp.einsum('i,jk->ik', a, b)
 
     def test_einsum_more_than_2_operands(self):
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4],
             [5, 6],
         ])
-        b = mynp.array([
+        b = xp.array([
             [-2, 1, -1, 3],
             [-5, 3, 0, 2],
         ])
-        c = mynp.array([
+        c = xp.array([
             [0, 2, -3, 0],
             [1, -1, 1, -1],
             [4, -5, 6, -2],
         ])
 
-        self.assertEqual(mynp.einsum('ij,jk,lk->il', a, b, c).data, [
+        self.assertEqual(xp.einsum('ij,jk,lk->il', a, b, c).tolist(), [
             [17, -27, -103],
             [39, -61, -231],
             [61, -95, -359],
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2],
                 [3, 4],
@@ -2030,7 +2030,7 @@ class TestNdArray(unittest.TestCase):
                 [10, -12],
             ],
         ])
-        b = mynp.array([
+        b = xp.array([
             [
                 [-2, 1, -1, 3],
             ],
@@ -2038,7 +2038,7 @@ class TestNdArray(unittest.TestCase):
                 [-5, 3, 0, 2],
             ]
         ])
-        c = mynp.array([
+        c = xp.array([
             [0, 2, -3, 0],
             [1, -1, 1, -1],
             [3, -5, 6, -2],
@@ -2046,7 +2046,7 @@ class TestNdArray(unittest.TestCase):
             [5, 9, 6, 3],
         ])
 
-        self.assertEqual(mynp.einsum('ijk,kli,mi->mjl', a, b, c).data, [
+        self.assertEqual(xp.einsum('ijk,kli,mi->mjl', a, b, c).tolist(), [
             [
                 [-18],
                 [47],
@@ -2075,26 +2075,26 @@ class TestNdArray(unittest.TestCase):
         ])
 
     def test_getitem(self):
-        a = mynp.array([[[5]]])
+        a = xp.array([[[5]]])
 
         self.assertEqual(a[0][0][0], 5)
-        self.assertEqual(a[0, 0, 0].data, 5)
-        self.assertEqual(a[:, :, :].data, [[[5]]])
+        self.assertEqual(a[0, 0, 0].tolist(), 5)
+        self.assertEqual(a[:, :, :].tolist(), [[[5]]])
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
 
-        self.assertEqual(a[0, 0].data, 1)
-        self.assertEqual(a[0, 1].data, 2)
-        self.assertEqual(a[1, 0].data, 3)
-        self.assertEqual(a[1, 1].data, 4)
-        self.assertEqual(a[0, :].data, [1, 2])
-        self.assertEqual(a[1, :].data, [3, 4])
-        self.assertEqual(a[:, 0].data, [1, 3])
-        self.assertEqual(a[:, 1].data, [2, 4])
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[0, 0].tolist(), 1)
+        self.assertEqual(a[0, 1].tolist(), 2)
+        self.assertEqual(a[1, 0].tolist(), 3)
+        self.assertEqual(a[1, 1].tolist(), 4)
+        self.assertEqual(a[0, :].tolist(), [1, 2])
+        self.assertEqual(a[1, :].tolist(), [3, 4])
+        self.assertEqual(a[:, 0].tolist(), [1, 3])
+        self.assertEqual(a[:, 1].tolist(), [2, 4])
+        self.assertEqual(a[:, :].tolist(), [
             [1, 2],
             [3, 4]
         ])
@@ -2102,7 +2102,7 @@ class TestNdArray(unittest.TestCase):
         with self.assertRaises(IndexError):
             a[:, :, :]
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2113,23 +2113,23 @@ class TestNdArray(unittest.TestCase):
             ],
         ])
 
-        self.assertEqual(a[0, 0, 0].data, 1)
-        self.assertEqual(a[0, 0, 1].data, 2)
-        self.assertEqual(a[0, 0, 2].data, 3)
-        self.assertEqual(a[0, 1, 0].data, 4)
-        self.assertEqual(a[0, 1, 1].data, 5)
-        self.assertEqual(a[0, 1, 2].data, 6)
-        self.assertEqual(a[1, 0, 0].data, 7)
-        self.assertEqual(a[1, 0, 1].data, 8)
-        self.assertEqual(a[1, 0, 2].data, 9)
-        self.assertEqual(a[1, 1, 0].data, 10)
-        self.assertEqual(a[1, 1, 1].data, 11)
-        self.assertEqual(a[1, 1, 2].data, 12)
+        self.assertEqual(a[0, 0, 0].tolist(), 1)
+        self.assertEqual(a[0, 0, 1].tolist(), 2)
+        self.assertEqual(a[0, 0, 2].tolist(), 3)
+        self.assertEqual(a[0, 1, 0].tolist(), 4)
+        self.assertEqual(a[0, 1, 1].tolist(), 5)
+        self.assertEqual(a[0, 1, 2].tolist(), 6)
+        self.assertEqual(a[1, 0, 0].tolist(), 7)
+        self.assertEqual(a[1, 0, 1].tolist(), 8)
+        self.assertEqual(a[1, 0, 2].tolist(), 9)
+        self.assertEqual(a[1, 1, 0].tolist(), 10)
+        self.assertEqual(a[1, 1, 1].tolist(), 11)
+        self.assertEqual(a[1, 1, 2].tolist(), 12)
 
         with self.assertRaises(IndexError):
             a[1, 1, 3]
 
-        self.assertEqual(a[:, :, :].data, [
+        self.assertEqual(a[:, :, :].tolist(), [
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2139,11 +2139,11 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ])
-        self.assertEqual(a[:, 1].data, [
+        self.assertEqual(a[:, 1].tolist(), [
             [4, 5, 6],
             [10, 11, 12]
         ])
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2153,37 +2153,37 @@ class TestNdArray(unittest.TestCase):
                 [10, 11, 12]
             ]
         ])
-        self.assertEqual(a[:, 1, 0].data, [4, 10])
-        self.assertEqual(a[1, 0, 2].data, 9)
+        self.assertEqual(a[:, 1, 0].tolist(), [4, 10])
+        self.assertEqual(a[1, 0, 2].tolist(), 9)
 
     def test_setitem(self):
-        a = mynp.array([[[5]]])
+        a = xp.array([[[5]]])
 
         a[0, 0, 0] = -1
-        self.assertEqual(a[:, :, :].data, [[[-1]]])
+        self.assertEqual(a[:, :, :].tolist(), [[[-1]]])
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
 
         a[1, 1] = 5
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [1, 2],
             [3, 5]
         ])
 
         a[:, 1] = 2 * a[:, 1]
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [1, 4],
             [3, 10]
         ])
 
         a[:, :] = -2
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [-2, -2],
             [-2, -2]
         ])
@@ -2191,7 +2191,7 @@ class TestNdArray(unittest.TestCase):
         with self.assertRaises(IndexError):
             a[:, :, :] = 1
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2204,7 +2204,7 @@ class TestNdArray(unittest.TestCase):
 
         a[:, :, 1] = 0
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [
                 [1, 0, 3],
                 [4, 0, 6]
@@ -2215,7 +2215,7 @@ class TestNdArray(unittest.TestCase):
             ]
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2231,7 +2231,7 @@ class TestNdArray(unittest.TestCase):
             [-3, -4]
         ]
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2242,7 +2242,7 @@ class TestNdArray(unittest.TestCase):
             ],
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [
                 [1, 2, 3],
                 [4, 5, 6]
@@ -2255,7 +2255,7 @@ class TestNdArray(unittest.TestCase):
 
         a[0, :, :2] = [-2, -1]
 
-        self.assertEqual(a[:, :].data, [
+        self.assertEqual(a[:, :].tolist(), [
             [
                 [-2, -1, 3],
                 [-2, -1, 6]
@@ -2274,44 +2274,44 @@ class TestNdArray(unittest.TestCase):
             ]
 
     def test_conj(self):
-        a = mynp.array(5).conj()
+        a = xp.array(5).conj()
 
-        self.assertEqual(a.data, 5)
+        self.assertEqual(a.tolist(), 5)
 
-        a = mynp.array(5.3).conj()
+        a = xp.array(5.3).conj()
 
-        self.assertEqual(a.data, 5.3)
+        self.assertEqual(a.tolist(), 5.3)
 
-        a = mynp.array(5 + 3*1j).conj()
+        a = xp.array(5 + 3*1j).conj()
 
-        self.assertEqual(a.data, 5 - 3*1j)
+        self.assertEqual(a.tolist(), 5 - 3*1j)
 
-        a = mynp.array([
+        a = xp.array([
             [1, 2, 3],
             [4, 5, 6],
         ]).conj()
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [1, 2, 3],
             [4, 5, 6],
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [-1.2, 2.3, -3.4],
             [4.5, -5.6, 6.7],
         ]).conj()
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [-1.2, 2.3, -3.4],
             [4.5, -5.6, 6.7],
         ])
 
-        a = mynp.array([
+        a = xp.array([
             [-1.2 + 5.6*1j, 2.3 - 4.5*1j, -3.4 + 1.2*1j],
             [4.5 - 6.7*1j, -5.6 - 2.3*1j, 6.7 + 3.4*1j],
         ]).conj()
 
-        self.assertEqual(a.data, [
+        self.assertEqual(a.tolist(), [
             [-1.2 - 5.6*1j, 2.3 + 4.5*1j, -3.4 - 1.2*1j],
             [4.5 + 6.7*1j, -5.6 + 2.3*1j, 6.7 - 3.4*1j],
         ])
