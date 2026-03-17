@@ -1822,6 +1822,14 @@ class TestNdArray(unittest.TestCase):
         self.assertEqual(xp.einsum('ii->', a).tolist(), 5)
 
         a = xp.array([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ])
+
+        self.assertEqual(xp.einsum('ii->i', a).tolist(), [1, 5, 9])
+
+        a = xp.array([
             [1, 2],
             [3, 4]
         ])
@@ -2072,6 +2080,34 @@ class TestNdArray(unittest.TestCase):
                 [47],
                 [-221],
             ],
+        ])
+
+        a = xp.array([
+            [1, 2, 3],
+            [4, 5, 6],
+        ])
+        b = xp.array([
+            [7, 8, 9, 10],
+            [11, 12, 13, 14],
+            [15, 16, 17, 18],
+        ])
+        c = xp.array([
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+        ])
+        d = xp.array([
+            [2, 1],
+            [0, 3],
+            [4, 5],
+            [6, 7],
+            [8, 9],
+        ])
+
+        self.assertEqual(xp.einsum('ij,jk,kl,lm->im', a, b, c, d).tolist(), [
+            [78696, 97540],
+            [185796, 230290],
         ])
 
     def test_getitem(self):
