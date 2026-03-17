@@ -98,7 +98,7 @@ class TestNdArray(unittest.TestCase):
         a = xp.array(data)
         b = xp.array(data)
         self.assertTrue(a == 3)
-        self.assertTrue(a == b)
+        self.assertTrue(a.tolist() == b.tolist())
 
         data = [1, 2, 3]
         a = xp.array(data)
