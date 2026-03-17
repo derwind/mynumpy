@@ -23,6 +23,11 @@ def norm(x: list | ndarray, ord: int | None = None) -> float:
     elif ord <= 0 or ord > 2:
         raise ValueError("only ord=1 and ord=2 are supported")
 
+    # Special case: matrix 1-norm (maximum absolute column sum) for 2D list inputs.
+    if ord == 1 and isinstance(x, list) and isinstance(x[0], list):
+        col_sums = [sum(abs(row[j]) for row in x) for j in range(len(x[0]))]
+        return max(col_sums)
+
     def walk(data, total):
         if is_number(data):
             total[0] += abs(data) if ord == 1 else abs(data) ** ord
